@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Seeds and noise</title>
+  <meta name="description" content="The designed seed of each pulse against the thermal seed a real fluid would supply, under the same shear amplification." />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="./demos.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" crossorigin="anonymous">
+  <style>.katex { white-space: nowrap; } .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }</style>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+    onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+  <style>
+    header.site-header nav strong.cur { color:#fff; font-weight:600; display:block; padding:7px 14px; white-space:nowrap; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand" href="./index.html">navier</a>
+    <nav>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-guide">Guide</span><span class="drop" id="menu-guide">
+        <a href="./equations.html">The problem</a>
+        <a href="./residual.html">The residual trick</a>
+        <a href="./scaling.html">Scales and exponents</a>
+        <a href="./core.html">The core</a>
+        <a href="./pulses.html">The annulus and the pulses</a>
+        <a href="./corrections.html">Corrections and completion</a>
+        <a href="./status.html">What is settled</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-fluctuations">Fluctuations</span><span class="drop" id="menu-fluctuations">
+        <a href="./fluctuating.html">Can fluctuations break it?</a>
+        <a href="./scales.html">The molecular limit</a>
+        <strong class="cur">Seeds and noise</strong>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-literature">Literature</span><span class="drop" id="menu-literature">
+        <a href="./papers.html">Papers</a>
+        <a href="./bibliography.html">Bibliography</a>
+        <a href="./map.html">Map</a>
+        <a href="./timeline.html">Timeline</a>
+      </span></span>
+      <a href="https://github.com/microprediction/navier">GitHub</a>
+    </nav>
+  </div>
+  <script>
+    (function () {
+      var hdr = document.querySelector('.site-header'), menus = [].slice.call(hdr.querySelectorAll('.menu'));
+      hdr.classList.add('js-menus');
+      function label(m) { return m.querySelector('.menu-label'); }
+      function links(m) { return [].slice.call(m.querySelectorAll('.drop a')); }
+      function isOpen(m) { return m.classList.contains('open'); }
+      function set(m, open, pin) {
+        m.classList.toggle('open', open); m.pinned = open && !!pin;
+        label(m).setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) menus.forEach(function (o) { if (o !== m && isOpen(o)) set(o, false); });
+      }
+      menus.forEach(function (m) {
+        var b = label(m);
+        b.addEventListener('click', function (e) { e.stopPropagation(); set(m, !(isOpen(m) && m.pinned), true); });
+        b.addEventListener('keydown', function (e) {
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowDown') return;
+          e.preventDefault();
+          if (e.key !== 'ArrowDown' && isOpen(m) && m.pinned) { set(m, false); return; }
+          set(m, true, true); links(m)[0].focus();
+        });
+        m.querySelector('.drop').addEventListener('keydown', function (e) {
+          var a = links(m), i = a.indexOf(document.activeElement), n = a.length;
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); a[(i + (e.key === 'ArrowDown' ? 1 : n - 1)) % n].focus(); }
+          else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); a[e.key === 'Home' ? 0 : n - 1].focus(); }
+        });
+        m.addEventListener('mouseenter', function () { if (!isOpen(m)) set(m, true, false); });
+        m.addEventListener('mouseleave', function () { if (isOpen(m) && !m.pinned) set(m, false); });
+        m.addEventListener('focusout', function (e) { if (isOpen(m) && !m.contains(e.relatedTarget)) set(m, false); });
+      });
+      document.addEventListener('click', function (e) { menus.forEach(function (m) { if (isOpen(m) && !m.contains(e.target)) set(m, false); }); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        menus.forEach(function (m) { if (!isOpen(m)) return; var inside = m.contains(document.activeElement); set(m, false); if (inside) label(m).focus(); });
+      });
+    })();
+  </script>
+</header>
+
+<main>
+  <h1>Seeds and noise</h1>
+  <p class="subtitle">The construction seeds its pulses with exponentially small forces. A fluid at temperature seeds them with noise. Same amplifier, different input.</p>
+
+  <p class="lead">
+    This page is a back of the envelope, not a theorem. It compares two numbers: the relative
+    amplitude at which a pulse of the construction starts, and the relative amplitude at which
+    thermal noise would start the same mode. Both are then multiplied by the same growth factor.
+  </p>
+
+  <h2>The designed seed</h2>
+  <p>
+    On the <a href="./pulses.html">pulses page</a> the envelope of a pulse satisfies
+    $P(v)\le e^{-c(v-L_s/2)^2/L_s}$, normalized to one at the midpoint. The seed at $v=0$ is
+    therefore at most $e^{-cL_s/4}$. The slot length $L_s$ is of the order of $S_*=\ell^2$ where
+    $\ell$ is the dyadic band index, $q\asymp 2^{-\ell}$. So the seed, relative to the pulse's
+    own peak, is
+  </p>
+  <div class="equation-card">
+    $$\frac{\text{seed}}{\text{peak}} \lesssim \exp\!\big(-c'\,(\log_2 1/q)^2\big),$$
+  </div>
+  <p>
+    smaller than any power of the concentration scale $q$. The growth factor $G=1/P(0)$ is the
+    reciprocal. At the peak the pulse amplitude is $q^{h/2}$ times the background speed, close
+    to the background itself since $h<1/100$.
+  </p>
+
+  <h2>The thermal seed</h2>
+  <p>
+    Thermal fluctuations in a volume $\ell^3$ of fluid at temperature $T$ have velocity
+    variance $k_BT/\rho\ell^3$ per component. Relative to the core speed $\nu/\ell$ at the same
+    scale,
+  </p>
+  <div class="equation-card">
+    $$\epsilon_T(\ell) = \frac{1}{\nu}\sqrt{\frac{k_BT}{\rho\,\ell}},$$
+  </div>
+  <p>
+    which is $1.2\times10^{-4}$ for air at a millimetre and $1.5\times10^{-2}$ at the mean free
+    path. It is a power of $\ell$, hence a power of $q$, hence larger than the designed seed at
+    every scale the construction reaches. Only the projection of the noise onto the growing
+    direction of the pulse equation is amplified, but a random field has an order-one
+    projection onto any fixed mode, at a random phase.
+  </p>
+
+  <div class="widget">
+    <div class="controls">
+      <label for="G">log<sub>10</sub> G</label>
+      <input type="range" id="G" min="1" max="14" step="0.25" value="6" />
+      <span class="val" id="GVal">6.00</span>
+      <label for="eT">log<sub>10</sub> &epsilon;<sub>T</sub></label>
+      <input type="range" id="eT" min="-9" max="-1" step="0.25" value="-4" />
+      <span class="val" id="eTVal">&minus;4.00</span>
+    </div>
+    <canvas id="seed" width="820" height="280"></canvas>
+    <div class="readout" id="seedRead"></div>
+  </div>
+  <div class="lookfor">
+    What to look for: the designed pulse, seeded at $1/G$, peaks at the intended amplitude. The
+    thermally seeded mode follows the same envelope from a higher start and peaks $G\epsilon_T$
+    times higher. Wherever the orange line crosses the background level, the linear description
+    of the annulus has failed and the pulse cannot deliver its stress as designed. With the
+    default values that happens; drag the thermal seed below $-\log_{10}G$ and it stops. The
+    construction's own seeds sit far below that line at every stage, which is the point.
+  </div>
+
+  <h2>What this does and does not show</h2>
+  <p>
+    It shows that the constructed solution is not a solution of the thermally fluctuating
+    equation with the same force, and that the difference is not small: the unmodelled input to
+    the amplifier exceeds the modelled one by a factor $G\epsilon_T$ that grows without bound as
+    the singular time approaches. It does not show that the thermal equation has no singularity
+    under this or any force. A turbulent annulus might still concentrate; it would just not do so
+    by this construction. And it takes the thermal noise at scale $\ell$ to be present at the
+    start of each pulse, which is the fluctuation-dissipation relation at work: viscosity
+    regenerates thermal fluctuations at scale $\ell$ on the time $\ell^2/\nu\asymp\tau$, which is
+    also the duration of a pulse.
+  </p>
+  <p>
+    The seed comparison also clarifies what "fine-tuned" means for this proof. Every stage
+    depends on a quantity, the seed, that is chosen smaller than any polynomial in the scale, and
+    every physical perturbation is polynomial in the scale. The proof is right about the
+    equation. The equation is a limit in which those seeds can be heard.
+  </p>
+
+  <h2>A test that could be run</h2>
+  <p>
+    Integrate the two-dimensional amplitude equation of the pulses page for one band with
+    (a) the designed initial condition and (b) an ensemble of random initial conditions of
+    relative size $\epsilon_T$, and record the stage at which (b) first exceeds the background.
+    Then compare that stage with the stage at which the cumulative stress of (a) has cancelled
+    the leading residual to the accuracy of one correction cycle, $q^{h/10}$. The first quantity
+    depends on constants the paper fixes but does not evaluate. A careful reading of Sections 6
+    and 7 would extract them.
+  </p>
+
+  <p class="pagenav">Back to <a href="./fluctuating.html">the fluctuation question</a>.</p>
+
+  <script>
+  (function(){
+    var cv=document.getElementById('seed'),ctx=cv.getContext('2d'),GS=document.getElementById('G'),GV=document.getElementById('GVal'),ES=document.getElementById('eT'),EV=document.getElementById('eTVal'),ro=document.getElementById('seedRead');
+    function draw(){
+      var lG=parseFloat(GS.value),lE=parseFloat(ES.value);GV.textContent=lG.toFixed(2);EV.innerHTML=(lE<0?'−':'')+Math.abs(lE).toFixed(2);
+      var N=300,Ls=1; // Gaussian envelope with P(0)=1/G: exp(-a (v-1/2)^2), a*(1/4)=lG*ln10
+      var a=4*lG*Math.LN10;
+      var W=cv.width,H=cv.height,L=64,R=24,T=18,B=40,ymin=Math.min(-lG-1,lE-1),ymax=Math.max(1,lG+lE+1);
+      function X(v){return L+v*(W-L-R);} function Y(lg){return T+(ymax-lg)/(ymax-ymin)*(H-T-B);}
+      ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+      ctx.strokeStyle='#eee';ctx.lineWidth=1;ctx.font='11px system-ui';ctx.fillStyle='#9a9a9a';ctx.textAlign='right';
+      var step=Math.max(1,Math.round((ymax-ymin)/6));
+      for(var g=Math.ceil(ymin);g<=ymax;g+=step){ctx.beginPath();ctx.moveTo(L,Y(g));ctx.lineTo(W-R,Y(g));ctx.stroke();ctx.fillText('10^'+g,L-6,Y(g)+4);}
+      ctx.textAlign='center';[0,0.25,0.5,0.75,1].forEach(function(f){ctx.beginPath();ctx.moveTo(X(f),T);ctx.lineTo(X(f),H-B);ctx.stroke();ctx.fillText('v/L_s = '+f,X(f),H-B+16);});
+      ctx.fillStyle='#5a5a5a';ctx.fillText('amplitude relative to the background speed, along one pulse',W/2,H-6);
+      ctx.strokeStyle='#9a9a9a';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(L,Y(0));ctx.lineTo(W-R,Y(0));ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle='#5a5a5a';ctx.textAlign='left';ctx.fillText('background speed',L+6,Y(0)-5);
+      function curve(offset,color,label){ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();for(var i=0;i<=N;i++){var v=i/N;var lg=offset-a*(v-0.5)*(v-0.5)/Math.LN10;if(i===0)ctx.moveTo(X(v),Y(lg));else ctx.lineTo(X(v),Y(lg));}ctx.stroke();ctx.fillStyle=color;ctx.font='12px system-ui';ctx.fillText(label,X(0.5)+6,Y(offset)+(offset>0?-8:16));}
+      curve(0,'#2a78d6','designed pulse (seed 1/G, peak = background)');
+      curve(lG+lE,'#eb6834','thermally seeded mode (seed ε_T)');
+      var over=lG+lE>0;
+      ro.innerHTML='G is the growth factor of a pulse, \u03b5_T the thermal seed relative to the flow. Designed seed 10^'+(-lG).toFixed(2)+'; thermal seed 10^'+lE.toFixed(2)+'; ratio 10^'+(lG+lE).toFixed(2)+'. '+(over?'<b>The thermally seeded mode exceeds the background: the linearization fails before the designed stress is delivered.</b>':'The thermally seeded mode stays below the background over this pulse.');
+    }
+    GS.addEventListener('input',draw);ES.addEventListener('input',draw);draw();
+  })();
+  </script>
+</main>
+
+  <footer>
+    <a href="https://github.com/microprediction/navier">Source</a> &middot;
+    Maintained by <a href="https://github.com/microprediction">Peter Cotton</a>.
+  </footer>
+</body>
+</html>

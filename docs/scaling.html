@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Scales and exponents</title>
+  <meta name="description" content="The similarity variables of the construction, the exponent h, and what each scale does as the singular time approaches." />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="./demos.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" crossorigin="anonymous">
+  <style>.katex { white-space: nowrap; } .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }</style>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+    onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+  <style>
+    header.site-header nav strong.cur { color:#fff; font-weight:600; display:block; padding:7px 14px; white-space:nowrap; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand" href="./index.html">navier</a>
+    <nav>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-guide">Guide</span><span class="drop" id="menu-guide">
+        <a href="./equations.html">The problem</a>
+        <a href="./residual.html">The residual trick</a>
+        <strong class="cur">Scales and exponents</strong>
+        <a href="./core.html">The core</a>
+        <a href="./pulses.html">The annulus and the pulses</a>
+        <a href="./corrections.html">Corrections and completion</a>
+        <a href="./status.html">What is settled</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-fluctuations">Fluctuations</span><span class="drop" id="menu-fluctuations">
+        <a href="./fluctuating.html">Can fluctuations break it?</a>
+        <a href="./scales.html">The molecular limit</a>
+        <a href="./seeds.html">Seeds and noise</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-literature">Literature</span><span class="drop" id="menu-literature">
+        <a href="./papers.html">Papers</a>
+        <a href="./bibliography.html">Bibliography</a>
+        <a href="./map.html">Map</a>
+        <a href="./timeline.html">Timeline</a>
+      </span></span>
+      <a href="https://github.com/microprediction/navier">GitHub</a>
+    </nav>
+  </div>
+  <script>
+    (function () {
+      var hdr = document.querySelector('.site-header'), menus = [].slice.call(hdr.querySelectorAll('.menu'));
+      hdr.classList.add('js-menus');
+      function label(m) { return m.querySelector('.menu-label'); }
+      function links(m) { return [].slice.call(m.querySelectorAll('.drop a')); }
+      function isOpen(m) { return m.classList.contains('open'); }
+      function set(m, open, pin) {
+        m.classList.toggle('open', open); m.pinned = open && !!pin;
+        label(m).setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) menus.forEach(function (o) { if (o !== m && isOpen(o)) set(o, false); });
+      }
+      menus.forEach(function (m) {
+        var b = label(m);
+        b.addEventListener('click', function (e) { e.stopPropagation(); set(m, !(isOpen(m) && m.pinned), true); });
+        b.addEventListener('keydown', function (e) {
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowDown') return;
+          e.preventDefault();
+          if (e.key !== 'ArrowDown' && isOpen(m) && m.pinned) { set(m, false); return; }
+          set(m, true, true); links(m)[0].focus();
+        });
+        m.querySelector('.drop').addEventListener('keydown', function (e) {
+          var a = links(m), i = a.indexOf(document.activeElement), n = a.length;
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); a[(i + (e.key === 'ArrowDown' ? 1 : n - 1)) % n].focus(); }
+          else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); a[e.key === 'Home' ? 0 : n - 1].focus(); }
+        });
+        m.addEventListener('mouseenter', function () { if (!isOpen(m)) set(m, true, false); });
+        m.addEventListener('mouseleave', function () { if (isOpen(m) && !m.pinned) set(m, false); });
+        m.addEventListener('focusout', function (e) { if (isOpen(m) && !m.contains(e.relatedTarget)) set(m, false); });
+      });
+      document.addEventListener('click', function (e) { menus.forEach(function (m) { if (isOpen(m) && !m.contains(e.target)) set(m, false); }); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        menus.forEach(function (m) { if (!isOpen(m)) return; var inside = m.contains(document.activeElement); set(m, false); if (inside) label(m).focus(); });
+      });
+    })();
+  </script>
+</header>
+
+<main>
+  <h1>Scales and exponents</h1>
+  <p class="subtitle">One small exponent $h$ fixes every rate in the construction. This page lists the rates and lets you move $h$.</p>
+
+  <p class="lead">
+    Write $\tau = 1-t$. The core is a column whose radius shrinks like $\tau^{1/2}$, the viscous
+    length, and whose height shrinks more slowly, like $\tau^{1/2-h}$. The anisotropy is the
+    point: it is what lets the speed grow faster than $\tau^{-1/2}$ while the energy still
+    vanishes.
+  </p>
+
+  <h2>Similarity variables</h2>
+  <p>
+    The paper fixes $0 < h < 1/100$ and writes $A = \tfrac12 + h$ and $D = \tfrac12 - h$.
+    In cylindrical coordinates $(r,\theta,z)$ it introduces a concentration scale $q>0$ and an
+    axial variable $\eta\in(-1,1)$ through
+  </p>
+  <div class="equation-card">
+    $$\tau = q\,(1-\eta^2),\qquad z = q^{D}\eta,\qquad X = \frac{r^2}{2q}.$$
+  </div>
+  <p>
+    On a fixed compact set of $(X,\eta)$ away from $\eta=\pm1$ one has $q\asymp\tau$, so $q$ is
+    the time remaining, reparametrized so that the axial coordinate has its own rate. The leading
+    axisymmetric field is built from three profiles $E$, $U$, $\Pi$ of $(X,\eta)$:
+  </p>
+  <div class="equation-card">
+    $$u_\theta^{(0)} = q^{-A}E,\qquad u_z^{(0)} = q^{-A}U,\qquad r\,u_r^{(0)} = V_0,\qquad p^{(0)} = q^{-2A}\Pi .$$
+  </div>
+  <p>
+    In English: swirl and axial speed grow like $q^{-1/2-h}$, the radial inflow is weaker by a
+    factor $q^{h}$, and the pressure is the square of the speed. Regularity on the axis is a
+    condition on the profiles, $E/\sqrt{2X}$ smooth at $X=0$, and incompressibility fixes $V_0$
+    from $U$.
+  </p>
+
+  <h2>The rates</h2>
+  <p>
+    Everything below follows from the two length exponents and the one speed exponent. The
+    demo plots them.
+  </p>
+  <div class="table-wrap"><table class="impl">
+    <thead><tr><th>Quantity</th><th>Scale</th><th>What it does as $\tau\downarrow 0$</th></tr></thead>
+    <tbody>
+      <tr><td>core radius $\ell_r$</td><td>$\tau^{1/2}$</td><td>the viscous length; shrinks</td></tr>
+      <tr><td>core height $\ell_z$</td><td>$\tau^{1/2-h}$</td><td>shrinks, but slower: $\ell_r/\ell_z\asymp\tau^{h}\to 0$</td></tr>
+      <tr><td>swirl, axial speed</td><td>$\tau^{-1/2-h}$</td><td>unbounded</td></tr>
+      <tr><td>radial speed</td><td>$O(\tau^{-1/2})$</td><td>unbounded, but smaller by $\tau^{h}$</td></tr>
+      <tr><td>core volume</td><td>$\tau^{3/2-h}$</td><td>vanishes</td></tr>
+      <tr><td>core energy</td><td>$\tau^{1/2-3h}$</td><td>vanishes, since $h<1/6$</td></tr>
+      <tr><td>core dissipation rate</td><td>$\tau^{-1/2-3h}$</td><td>diverges but is integrable in time</td></tr>
+      <tr><td>angular Reynolds number</td><td>$\tau^{-h}$</td><td>diverges, slowly</td></tr>
+      <tr><td>radial Reynolds number</td><td>$O(1)$</td><td>viscosity stays in the leading balance</td></tr>
+      <tr><td>axial / radial diffusion</td><td>$\tau^{2h}$</td><td>the expansion parameter of the background corrections</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="widget">
+    <div class="controls">
+      <label for="h">exponent h</label>
+      <input type="range" id="h" min="0.001" max="0.16" step="0.001" value="0.01" />
+      <span class="val" id="hVal">0.010</span>
+      <button id="toggle" class="on">core energy</button>
+    </div>
+    <canvas id="chart" width="820" height="300"></canvas>
+    <div class="readout" id="readout"></div>
+  </div>
+  <div class="lookfor">
+    What to look for: the speed line rises and the energy line falls for every $h$ below $1/6$,
+    and the two length lines separate. Push $h$ toward $1/6$ and the energy line flattens; past it
+    the energy would grow and the theorem's bounded-energy claim would fail. The paper keeps
+    $h<1/100$, far from that edge, because the correction cycle needs room, not because the
+    energy does.
+  </div>
+
+  <h2>Why the anisotropy</h2>
+  <p>
+    With $h=0$ the core would be an isotropic self-similar vortex with speed $\tau^{-1/2}$. Such
+    a flow has $\int|u|^3$ bounded, and by Escauriaza, Seregin and &Scaron;ver&aacute;k that
+    cannot blow up without a force, and by the scaling argument of Ne&ccaron;as, R&#367;&#382;i&ccaron;ka and
+    &Scaron;ver&aacute;k there is no nontrivial self-similar profile at all. A positive $h$ is a
+    way past both. The speed exceeds the critical rate $\tau^{-1/2}$ by $\tau^{-h}$, the column
+    is slender enough for the energy $\tau^{1/2-3h}$ still to vanish, and the axial direction
+    supplies a second small parameter, $\ell_r^2/\ell_z^2 = \tau^{2h}$, in which the background can
+    be corrected order by order.
+  </p>
+  <p>
+    The angular Reynolds number $\tau^{-h}$ says the fluid makes ever more turns in one radial
+    diffusion time. That is what amplifies the pulses at the edge of the core. The radial
+    Reynolds number $O(1)$ says viscosity never drops out of the radial balance. That is what
+    makes this a Navier&ndash;Stokes construction rather than an Euler one dressed up.
+  </p>
+
+  <h2>Viscosity is a change of units</h2>
+  <p>
+    The construction is done at $\nu = 1$ and transferred to any $\nu>0$ by
+  </p>
+  <div class="equation-card">
+    $$u_\nu(x,t) = \sqrt{\nu}\,u(x/\sqrt{\nu},\,t),\qquad p_\nu = \nu\,p(x/\sqrt\nu,t),\qquad f_\nu = \sqrt{\nu}\,f(x/\sqrt\nu,t).$$
+  </div>
+  <p>
+    Time is untouched, so the singular time stays at one. Lengths scale by $\sqrt\nu$ and speeds
+    by $\sqrt\nu$. The energy scales by $\nu^{5/2}$. This matters for the
+    <a href="./scales.html">molecular limit</a>: the core radius in metres is
+    $\sqrt{\nu\tau}$ times a fixed number, and the core speed is $\sqrt{\nu/\tau}$ times a fixed
+    number, so their product is $\nu$ times a fixed number for every fluid.
+  </p>
+
+  <p class="pagenav">Next: <a href="./core.html">the core</a>.</p>
+
+  <script>
+  (function(){
+    var cv=document.getElementById('chart'), ctx=cv.getContext('2d');
+    var hS=document.getElementById('h'), hV=document.getElementById('hVal'), tog=document.getElementById('toggle'), ro=document.getElementById('readout');
+    var showE=true;
+    var series=[
+      {name:'core radius τ^{1/2}', color:'#2a78d6', f:function(t,h){return 0.5*Math.log10(t);}},
+      {name:'core height τ^{1/2−h}', color:'#eb6834', f:function(t,h){return (0.5-h)*Math.log10(t);}},
+      {name:'speed τ^{−1/2−h}', color:'#1baf7a', f:function(t,h){return (-0.5-h)*Math.log10(t);}},
+      {name:'core energy τ^{1/2−3h}', color:'#eda100', f:function(t,h){return (0.5-3*h)*Math.log10(t);}}
+    ];
+    function draw(){
+      var h=parseFloat(hS.value); hV.textContent=h.toFixed(3);
+      var W=cv.width,H=cv.height,L=64,R=24,T=18,B=40;
+      ctx.clearRect(0,0,W,H); ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+      var xs=[]; for(var i=0;i<=200;i++) xs.push(-8+8*i/200); // log10 tau from -8 to 0
+      var ymin=-8,ymax=8;
+      function X(lt){return L+(lt+8)/8*(W-L-R);} function Y(v){return T+(ymax-v)/(ymax-ymin)*(H-T-B);}
+      ctx.strokeStyle='#eee'; ctx.lineWidth=1; ctx.font='11px system-ui'; ctx.fillStyle='#9a9a9a'; ctx.textAlign='right';
+      for(var g=ymin;g<=ymax;g+=4){ctx.beginPath();ctx.moveTo(L,Y(g));ctx.lineTo(W-R,Y(g));ctx.stroke();ctx.fillText('10^'+g,L-6,Y(g)+4);}
+      ctx.textAlign='center';
+      for(var g2=-8;g2<=0;g2+=2){ctx.beginPath();ctx.moveTo(X(g2),T);ctx.lineTo(X(g2),H-B);ctx.stroke();ctx.fillText('τ = 10^'+g2,X(g2),H-B+16);}
+      ctx.fillStyle='#5a5a5a'; ctx.fillText('log-log, viscosity one, prefactors set to one',W/2,H-6);
+      series.forEach(function(s,k){
+        if(k===3&&!showE) return;
+        ctx.strokeStyle=s.color; ctx.lineWidth=2; ctx.beginPath();
+        xs.forEach(function(lt,i){var t=Math.pow(10,lt); var v=s.f(t,h); if(i===0)ctx.moveTo(X(lt),Y(v)); else ctx.lineTo(X(lt),Y(v));});
+        ctx.stroke();
+      });
+      var lx=L+8; ctx.font='12px system-ui'; ctx.textAlign='left';
+      series.forEach(function(s,k){ if(k===3&&!showE) return; ctx.fillStyle=s.color; ctx.fillRect(lx,T+4,10,10); ctx.fillStyle='#1a1a1a'; ctx.fillText(s.name,lx+14,T+13); lx+=ctx.measureText(s.name).width+34; });
+      var r=[]; r.push('At τ = 10⁻⁸: speed ≈ 10^'+((0.5+h)*8).toFixed(2)+', core energy ≈ 10^'+((-0.5+3*h)*8).toFixed(2)+', ℓ_r/ℓ_z ≈ 10^'+(-8*h).toFixed(2)+'.');
+      r.push(h<1/6?' Energy vanishes (h < 1/6).':' <b>Energy grows: h ≥ 1/6 breaks the bounded-energy claim.</b>');
+      ro.innerHTML=r.join('');
+    }
+    hS.addEventListener('input',draw);
+    tog.addEventListener('click',function(){showE=!showE;tog.classList.toggle('on',showE);draw();});
+    draw();
+  })();
+  </script>
+</main>
+
+  <footer>
+    <a href="https://github.com/microprediction/navier">Source</a> &middot;
+    Maintained by <a href="https://github.com/microprediction">Peter Cotton</a>.
+  </footer>
+</body>
+</html>

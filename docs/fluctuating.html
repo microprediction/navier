@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Can fluctuations break it?</title>
+  <meta name="description" content="Whether a fast-fluctuating version of Navier–Stokes, thermal, kinetic, transport-noise or fast-switching, would still blow up under the constructed force. What is proved and what is not." />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" crossorigin="anonymous">
+  <style>.katex { white-space: nowrap; } .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }</style>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+    onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+  <style>
+    header.site-header nav strong.cur { color:#fff; font-weight:600; display:block; padding:7px 14px; white-space:nowrap; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand" href="./index.html">navier</a>
+    <nav>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-guide">Guide</span><span class="drop" id="menu-guide">
+        <a href="./equations.html">The problem</a>
+        <a href="./residual.html">The residual trick</a>
+        <a href="./scaling.html">Scales and exponents</a>
+        <a href="./core.html">The core</a>
+        <a href="./pulses.html">The annulus and the pulses</a>
+        <a href="./corrections.html">Corrections and completion</a>
+        <a href="./status.html">What is settled</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-fluctuations">Fluctuations</span><span class="drop" id="menu-fluctuations">
+        <strong class="cur">Can fluctuations break it?</strong>
+        <a href="./scales.html">The molecular limit</a>
+        <a href="./seeds.html">Seeds and noise</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-literature">Literature</span><span class="drop" id="menu-literature">
+        <a href="./papers.html">Papers</a>
+        <a href="./bibliography.html">Bibliography</a>
+        <a href="./map.html">Map</a>
+        <a href="./timeline.html">Timeline</a>
+      </span></span>
+      <a href="https://github.com/microprediction/navier">GitHub</a>
+    </nav>
+  </div>
+  <script>
+    (function () {
+      var hdr = document.querySelector('.site-header'), menus = [].slice.call(hdr.querySelectorAll('.menu'));
+      hdr.classList.add('js-menus');
+      function label(m) { return m.querySelector('.menu-label'); }
+      function links(m) { return [].slice.call(m.querySelectorAll('.drop a')); }
+      function isOpen(m) { return m.classList.contains('open'); }
+      function set(m, open, pin) {
+        m.classList.toggle('open', open); m.pinned = open && !!pin;
+        label(m).setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) menus.forEach(function (o) { if (o !== m && isOpen(o)) set(o, false); });
+      }
+      menus.forEach(function (m) {
+        var b = label(m);
+        b.addEventListener('click', function (e) { e.stopPropagation(); set(m, !(isOpen(m) && m.pinned), true); });
+        b.addEventListener('keydown', function (e) {
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowDown') return;
+          e.preventDefault();
+          if (e.key !== 'ArrowDown' && isOpen(m) && m.pinned) { set(m, false); return; }
+          set(m, true, true); links(m)[0].focus();
+        });
+        m.querySelector('.drop').addEventListener('keydown', function (e) {
+          var a = links(m), i = a.indexOf(document.activeElement), n = a.length;
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); a[(i + (e.key === 'ArrowDown' ? 1 : n - 1)) % n].focus(); }
+          else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); a[e.key === 'Home' ? 0 : n - 1].focus(); }
+        });
+        m.addEventListener('mouseenter', function () { if (!isOpen(m)) set(m, true, false); });
+        m.addEventListener('mouseleave', function () { if (isOpen(m) && !m.pinned) set(m, false); });
+        m.addEventListener('focusout', function (e) { if (isOpen(m) && !m.contains(e.relatedTarget)) set(m, false); });
+      });
+      document.addEventListener('click', function (e) { menus.forEach(function (m) { if (isOpen(m) && !m.contains(e.target)) set(m, false); }); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        menus.forEach(function (m) { if (!isOpen(m)) return; var inside = m.contains(document.activeElement); set(m, false); if (inside) label(m).focus(); });
+      });
+    })();
+  </script>
+</header>
+
+<main>
+  <h1>Can fluctuations break it?</h1>
+  <p class="subtitle">Four ways to make the equations fluctuate, and what each does to the constructed singularity.</p>
+
+  <p class="lead">
+    The construction is a statement about one equation with one force. A real fluid is not that
+    equation. It has thermal noise, a molecular scale, and unresolved fast motions. This page
+    asks whether a model with any of those, arguably the more accurate model, would still blow
+    up under the constructed force. The answer depends on what "fluctuating" means, and in one
+    case it is a theorem.
+  </p>
+
+  <h2>Three senses of breaking</h2>
+  <p>
+    A proof can be broken by finding an error. This page does not do that and has no reason to
+    think one exists; the Lean formalization makes a gap in the logic unlikely, though the
+    fidelity of the formal statement to Fefferman's is a separate human check. A proof can also
+    be shown to rest on hypotheses that the physical system does not satisfy. That is easy here,
+    and it is not news: the force is smooth but not analytic, the fluid is at zero temperature,
+    and the continuum has infinite resolution. The interesting sense is the third. Take a model
+    that differs from Navier&ndash;Stokes by a fluctuation, and ask whether the constructed
+    force still produces a singularity. If not, the theorem is true and irrelevant to that model,
+    and the question becomes which model is the fluid.
+  </p>
+
+  <h2>What the construction depends on</h2>
+  <p>
+    Three features of the proof decide how it responds to a perturbation.
+  </p>
+  <ul>
+    <li><strong>The force is the residual.</strong> It is defined as what the equation leaves
+      over after the flow is chosen. Change the equation and the same force no longer matches
+      the same flow; the mismatch is the size of the change times the size of the flow's
+      derivatives, and those diverge. A perturbation of relative size $\epsilon$ in the
+      viscous term produces a residual $\epsilon\,\nu\Delta u\asymp\epsilon\,\tau^{-3/2-h}$,
+      the same order as the terms the construction spent 166 pages cancelling.</li>
+    <li><strong>The seeds are exponentially small.</strong> Each pulse starts at a Gaussian
+      tail, $P(0)\le e^{-cL_s/4}$ with $L_s\asymp(\log 1/q)^2$, and is amplified by the shear to
+      an amplitude comparable to the background. Anything else that seeds the same instability
+      at larger amplitude gets the same amplification.</li>
+    <li><strong>The cancellation is to every order.</strong> The residual is made flat, smaller
+      than every power of $q$. A perturbation that is any fixed power of $q$ is not small on that
+      scale.</li>
+  </ul>
+  <p>
+    In English: the singularity is an exactly balanced object, not a stable attractor of the
+    dynamics. That does not make it wrong. It makes it fragile, and the question is whether
+    fragility can be turned into a theorem for a given fluctuating model.
+  </p>
+
+  <h2>Model 1: a fast exogenous switch</h2>
+  <p>
+    Suppose the viscosity flips between two values at rate $\lambda$, driven by a Markov chain
+    that knows nothing about the flow. This is the fast switching of the
+    <a href="https://homogenization.microprediction.org">homogenization</a> pages. For
+    $\lambda$ large the averaged equation is Navier&ndash;Stokes with the mean viscosity plus
+    a corrector of order $1/\lambda$, and the theorem holds at the mean viscosity with its own
+    force. Nothing is broken.
+  </p>
+  <p>
+    Except that averaging requires the switch to be fast relative to the dynamics, and a
+    singularity has no slowest time scale. The core evolves on the time remaining, $\tau$.
+    Once $\tau\ll1/\lambda$ the switch is slow: the flow sees a single frozen value of
+    $\nu$ for the rest of its life. The force was tuned to the mean viscosity and now the
+    equation has a different one, and by the first point above the pre-tuned force is wrong
+    by a term of the leading order. The singularity outruns the averaging. Whether the switched
+    equation admits any fixed force that blows up along almost every path of the chain is open.
+    Cao, Chi and Nie show that from any smooth state there are nearby forces that produce
+    blow-up, but a fixed force must be chosen before the path is known, so their density result
+    does not answer it.
+  </p>
+
+  <h2>Model 2: transport noise</h2>
+  <p>
+    Replace the unresolved small-scale velocity by a stochastic transport term: fluid parcels
+    move with the resolved velocity plus a rapidly fluctuating, divergence-free, Stratonovich
+    noise with a prescribed spectrum. This is the model of Flandoli and Luo, and of Agresti,
+    and it is derived from Newton's law with a separation of scales. Here there is a theorem.
+    Agresti proves that for any bound $M$ on the data and any $\epsilon>0$ there is a noise
+    intensity and spectrum for which the equation on the torus has a unique global smooth
+    solution with probability at least $1-\epsilon$, and states in his Remark 4.4 that the
+    result extends to a deterministic force $f$ that is smooth with spatial derivatives bounded
+    uniformly in time.
+  </p>
+  <p>
+    The constructed force qualifies: it is $C_c^\infty$. So the periodic equation with the
+    constructed force and a suitable transport noise has a global smooth solution with high
+    probability. For that equation the conclusion of the theorem fails. The mechanism is the one
+    the first point predicts: in the scaling limit the transport noise acts as an additional
+    eddy viscosity with enhanced dissipation, the flow under the fixed force is a different flow,
+    and the fine balance is gone. There is no contradiction with the theorem holding for every
+    $\nu$, because the theorem's force depends on $\nu$ and the eddy viscosity was not in the
+    force's design.
+  </p>
+  <p>
+    The caveats are real. The noise is chosen after the force, with intensity depending on its
+    size; whether a fixed physical noise defeats every force is a different and open question,
+    and the natural next construction would be a force built to blow up through the noise.
+    The noise is multiplicative and scale-invariant, a model of turbulent transport, not of
+    molecular motion. And "with high probability" is not "surely". Still, this is the one
+    fluctuating model in which the constructed singularity is known not to survive.
+  </p>
+
+  <h2>Model 3: thermal noise</h2>
+  <p>
+    Landau and Lifshitz add to the viscous stress a random stress, white in space and time,
+    with variance $2k_BT\,\rho\nu$ per unit volume and time, fixed by the fluctuation-dissipation
+    relation. This is fluctuating hydrodynamics and it is the physically correct correction to
+    Navier&ndash;Stokes at scales above the mean free path. It is also, as a PDE in three
+    dimensions, too rough for classical solutions, and results on regularization by additive
+    noise are described by Flandoli and Luo as inconclusive. There is no theorem either way for
+    the constructed force.
+  </p>
+  <p>
+    There is a heuristic. The velocity fluctuation thermal noise induces at scale $\ell$ is
+    $v_T(\ell)=\sqrt{k_BT/\rho\ell^3}$, and relative to the core speed $\nu/\ell$ this is
+    $\sqrt{k_BT/\rho\ell}\,/\nu$, a fraction that grows as the core shrinks and reaches about a
+    percent at the mean free path in air. That is many orders of magnitude above the
+    exponentially small seeds of the construction, at every scale the construction uses. The
+    <a href="./seeds.html">seeds page</a> puts the two numbers side by side. Thermal noise
+    projected onto the growing direction of the pulse equation is amplified by the same factor
+    the designed seed is, and if it reaches the background amplitude the linearization fails and
+    the annulus is turbulent rather than tuned. This is not a proof that the thermal equation
+    does not blow up; it is a reason to expect that the constructed solution is not what the
+    thermal equation does under the constructed force.
+  </p>
+
+  <h2>Model 4: molecules</h2>
+  <p>
+    Below the mean free path there is no fluid. Navier&ndash;Stokes is the first-order
+    Chapman&ndash;Enskog approximation to Boltzmann in the Knudsen number $\ell_{\rm mfp}/\ell$,
+    and it is not the more accurate model at small $\ell$; Boltzmann is. The core radius is
+    $\sqrt{\nu\tau}$ up to a fixed factor and reaches the mean free path at $\tau^*=\ell_{\rm mfp}^2/\nu$,
+    a third of a nanosecond before the singular time in air. At that moment the core speed
+    $\nu/\ell_{\rm mfp}$ is the molecular thermal speed, so the Mach number is order one as well;
+    this is not a coincidence but the kinetic-theory identity $\nu\approx\tfrac12\ell_{\rm mfp}\bar v$.
+    The continuum, the incompressibility, and the isothermal assumption all fail together.
+    Braunstein's point that a molecular spectral cutoff turns the thermal equation into a
+    finite-dimensional stochastic system with a Lyapunov function, hence globally well posed,
+    is the same observation from the other side. The <a href="./scales.html">molecular limit</a>
+    page has the arithmetic for air and water.
+  </p>
+
+  <h2>The averaging trap</h2>
+  <p>
+    One tempting shortcut fails and is worth displaying. Suppose one replaced the velocity by
+    its angular mean and asked whether the averaged equation blows up. The construction's own
+    stress is the answer: the pulses average to zero and their momentum flux
+    $\langle w\otimes w\rangle$ does not, and that flux is a leading-order term. Replacing $u$
+    by $\bar u$ drops it. The proof is a homogenization calculation run backwards, choosing the
+    fast oscillations to produce a wanted Reynolds stress, and any averaged model that omits
+    the stress is not the averaged equation. The $1/\lambda$ Green&ndash;Kubo corrector of an
+    exogenous chain does not apply to oscillations the flow generates itself, without a separate
+    scaling theorem.
+  </p>
+
+  <h2>Verdict</h2>
+  <div class="table-wrap"><table class="impl">
+    <thead><tr><th>Fluctuating model</th><th>What is proved</th><th>Constructed singularity</th></tr></thead>
+    <tbody>
+      <tr><td>Fast exogenous switch</td><td>Averaging holds only while $\lambda\tau\gg1$; nothing about the switched equation near $\tau=0$.</td><td>Pre-tuned force is wrong after the last switch. Fate open.</td></tr>
+      <tr><td>Transport noise</td><td>Global smooth solution with high probability for any smooth force, noise chosen after the force (Agresti 2026).</td><td>Does not survive, with high probability.</td></tr>
+      <tr><td>Thermal noise</td><td>No theorem. Additive-noise regularization is inconclusive.</td><td>Heuristically swamped at the seed stage. Fate open.</td></tr>
+      <tr><td>Molecular cutoff</td><td>Finite-dimensional stochastic system with a Lyapunov function; no blow-up.</td><td>Not described by the equations 0.3 ns before it forms.</td></tr>
+      <tr><td>Analytic force</td><td>Regular at the singular point for this class of flows (Constantin, Ignatova, Vicol 2026).</td><td>Cannot be built.</td></tr>
+    </tbody>
+  </table></div>
+  <p>
+    Neither reading dominates. The theorem is correct about its equation and the equation is
+    not the fluid at the scale where the theorem bites. The fluctuating models that are known to
+    be regular achieve it by tuning the noise to the force, which is the same move the theorem
+    makes in the other direction. The question that would settle more is whether a fixed
+    physical noise defeats every smooth force, and nobody has proved that.
+  </p>
+
+  <h2>What would settle more</h2>
+  <ul>
+    <li>A transport-noise theorem with the noise fixed first and the force arbitrary, or a
+      construction of a force that blows up through a fixed noise. Either would decide model 2.</li>
+    <li>A numerical integration of the linearized pulse equation of the
+      <a href="./pulses.html">pulses page</a> with thermally seeded initial data, to see whether
+      the seeded modes saturate before the designed ones deliver their stress. The
+      <a href="./seeds.html">seeds page</a> is the back of the envelope for that.</li>
+    <li>The constants. The theorem never states the prefactor $e_0$ or the profile scales, and
+      the molecular estimates on the <a href="./scales.html">molecular limit</a> page set them
+      to one. A construction with enormous constants would move the continuum failure earlier,
+      not later.</li>
+  </ul>
+
+  <p class="pagenav">Next: <a href="./scales.html">the molecular limit</a>.</p>
+</main>
+
+  <footer>
+    <a href="https://github.com/microprediction/navier">Source</a> &middot;
+    Maintained by <a href="https://github.com/microprediction">Peter Cotton</a>.
+  </footer>
+</body>
+</html>

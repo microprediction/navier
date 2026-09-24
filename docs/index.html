@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Navier–Stokes</title>
+  <meta name="description" content="A reader's guide to the September 2026 forced blow-up construction for the three-dimensional Navier–Stokes equations, and to the question of whether a fluctuating fluid would reach it." />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" crossorigin="anonymous">
+  <style>.katex { white-space: nowrap; } .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }</style>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+    onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+  <style>
+    header.site-header nav strong.cur { color:#fff; font-weight:600; display:block; padding:7px 14px; white-space:nowrap; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand" href="./index.html">navier</a>
+    <nav>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-guide">Guide</span><span class="drop" id="menu-guide">
+        <a href="./equations.html">The problem</a>
+        <a href="./residual.html">The residual trick</a>
+        <a href="./scaling.html">Scales and exponents</a>
+        <a href="./core.html">The core</a>
+        <a href="./pulses.html">The annulus and the pulses</a>
+        <a href="./corrections.html">Corrections and completion</a>
+        <a href="./status.html">What is settled</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-fluctuations">Fluctuations</span><span class="drop" id="menu-fluctuations">
+        <a href="./fluctuating.html">Can fluctuations break it?</a>
+        <a href="./scales.html">The molecular limit</a>
+        <a href="./seeds.html">Seeds and noise</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-literature">Literature</span><span class="drop" id="menu-literature">
+        <a href="./papers.html">Papers</a>
+        <a href="./bibliography.html">Bibliography</a>
+        <a href="./map.html">Map</a>
+        <a href="./timeline.html">Timeline</a>
+      </span></span>
+      <a href="https://github.com/microprediction/navier">GitHub</a>
+    </nav>
+  </div>
+  <script>
+    (function () {
+      var hdr = document.querySelector('.site-header'), menus = [].slice.call(hdr.querySelectorAll('.menu'));
+      hdr.classList.add('js-menus');
+      function label(m) { return m.querySelector('.menu-label'); }
+      function links(m) { return [].slice.call(m.querySelectorAll('.drop a')); }
+      function isOpen(m) { return m.classList.contains('open'); }
+      function set(m, open, pin) {
+        m.classList.toggle('open', open); m.pinned = open && !!pin;
+        label(m).setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) menus.forEach(function (o) { if (o !== m && isOpen(o)) set(o, false); });
+      }
+      menus.forEach(function (m) {
+        var b = label(m);
+        b.addEventListener('click', function (e) { e.stopPropagation(); set(m, !(isOpen(m) && m.pinned), true); });
+        b.addEventListener('keydown', function (e) {
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowDown') return;
+          e.preventDefault();
+          if (e.key !== 'ArrowDown' && isOpen(m) && m.pinned) { set(m, false); return; }
+          set(m, true, true); links(m)[0].focus();
+        });
+        m.querySelector('.drop').addEventListener('keydown', function (e) {
+          var a = links(m), i = a.indexOf(document.activeElement), n = a.length;
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); a[(i + (e.key === 'ArrowDown' ? 1 : n - 1)) % n].focus(); }
+          else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); a[e.key === 'Home' ? 0 : n - 1].focus(); }
+        });
+        m.addEventListener('mouseenter', function () { if (!isOpen(m)) set(m, true, false); });
+        m.addEventListener('mouseleave', function () { if (isOpen(m) && !m.pinned) set(m, false); });
+        m.addEventListener('focusout', function (e) { if (isOpen(m) && !m.contains(e.relatedTarget)) set(m, false); });
+      });
+      document.addEventListener('click', function (e) { menus.forEach(function (m) { if (isOpen(m) && !m.contains(e.target)) set(m, false); }); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        menus.forEach(function (m) { if (!isOpen(m)) return; var inside = m.contains(document.activeElement); set(m, false); if (inside) label(m).focus(); });
+      });
+    })();
+  </script>
+</header>
+
+<main>
+  <h1>Navier&ndash;Stokes</h1>
+  <p class="subtitle">A guide to the forced blow-up of September 2026, and to whether a fluctuating fluid could reach it.</p>
+
+  <p class="lead">
+    On 8 September 2026 OpenAI released a 166-page construction of a smooth, compactly
+    supported force under which the three-dimensional Navier&ndash;Stokes equations, started
+    from rest, develop unbounded velocity at time one while the kinetic energy stays bounded.
+    That is alternative (C) of the Clay problem as Fefferman stated it in 2000. This site
+    exists to understand the construction, one mechanism at a time, and then to ask a
+    physical question about it.
+  </p>
+  <p>
+    The question is this. Real fluids are not the continuum of the equations. They carry thermal
+    noise, they have a molecular scale, and any turbulent fluid has fast motions that a model of
+    the slow flow treats as fluctuations. Would a fast-fluctuating version of Navier&ndash;Stokes,
+    arguably the more accurate model, still blow up under this force? The
+    <a href="./fluctuating.html">fluctuations</a> pages collect what is known and what is not.
+  </p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 760 305" role="img" aria-label="A collapsing vortex column at the origin, an annulus of oscillatory pulses around it, and a smooth exterior swirl; the external force is smooth everywhere and the singular momentum imbalance in the annulus is supplied by the pulses.">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4a3aff"/>
+        </marker>
+      </defs>
+      <!-- axis -->
+      <line x1="380" y1="20" x2="380" y2="280" stroke="#e2e2e2" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <text x="386" y="30" font-size="11.5" fill="#9a9a9a">z</text>
+      <!-- exterior swirl -->
+      <ellipse cx="380" cy="150" rx="300" ry="120" fill="none" stroke="#e2e2e2" stroke-width="1.5"/>
+      <ellipse cx="380" cy="150" rx="240" ry="96" fill="none" stroke="#e2e2e2" stroke-width="1.5"/>
+      <text x="130" y="60" font-size="12" fill="#5a5a5a">heat exterior: pure swirl, residual zero</text>
+      <!-- annulus -->
+      <ellipse cx="380" cy="150" rx="150" ry="62" fill="#ecebfb" stroke="#4a3aff" stroke-width="1.5" opacity="0.9"/>
+      <ellipse cx="380" cy="150" rx="70" ry="30" fill="#fafafa" stroke="#4a3aff" stroke-width="1.5"/>
+      <!-- pulses: short wavy strokes in the annulus -->
+      <g stroke="#1f1d3d" stroke-width="1.6" fill="none">
+        <path d="M 250 150 q 6 -6 12 0 t 12 0 t 12 0"/>
+        <path d="M 470 150 q 6 -6 12 0 t 12 0 t 12 0"/>
+        <path d="M 300 110 q 6 -6 12 0 t 12 0"/>
+        <path d="M 440 110 q 6 -6 12 0 t 12 0"/>
+        <path d="M 300 190 q 6 -6 12 0 t 12 0"/>
+        <path d="M 440 190 q 6 -6 12 0 t 12 0"/>
+      </g>
+      <text x="398" y="258" font-size="12" fill="#4a3aff">annulus: pulses supply the missing momentum flux</text>
+      <!-- core column -->
+      <rect x="371" y="105" width="18" height="90" rx="9" fill="#4a3aff"/>
+      <text x="404" y="150" font-size="12" fill="#1f1d3d">core</text>
+      <!-- spiral inflow arrows -->
+      <path d="M 330 150 C 340 140, 352 138, 366 146" fill="none" stroke="#4a3aff" stroke-width="1.5" marker-end="url(#arr)"/>
+      <path d="M 430 150 C 420 160, 408 162, 394 154" fill="none" stroke="#4a3aff" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- axial outflow -->
+      <path d="M 380 105 L 380 60" fill="none" stroke="#4a3aff" stroke-width="1.5" marker-end="url(#arr)"/>
+      <path d="M 380 195 L 380 240" fill="none" stroke="#4a3aff" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- scale labels -->
+      <text x="380" y="292" text-anchor="middle" font-size="12" fill="#5a5a5a">radius &#8776; &tau;<tspan font-size="9" dy="-5">1/2</tspan><tspan dy="5">, height &#8776; &tau;</tspan><tspan font-size="9" dy="-5">1/2&minus;h</tspan><tspan dy="5">, speed &#8776; &tau;</tspan><tspan font-size="9" dy="-5">&minus;1/2&minus;h</tspan></text>
+      <text x="740" y="292" text-anchor="end" font-size="11.5" fill="#9a9a9a">&tau; = 1 &minus; t</text>
+    </svg>
+    <p class="caption">
+      The three regions of the construction at one instant before the singular time. Fluid
+      spirals into a column that thins faster than it shortens; the column's own momentum
+      balance closes, the exterior's closes, and the annulus between them does not. Pulses in
+      the annulus close it.
+    </p>
+  </div>
+
+  <h2 id="result">The result</h2>
+  <p>
+    Write $\tau = 1 - t$ for the time remaining. The theorem is stated for every viscosity.
+  </p>
+  <div class="equation-card">
+    $$\partial_t u + (u\cdot\nabla)u - \nu\Delta u + \nabla p = f,\qquad \nabla\cdot u = 0,\qquad u(\cdot,0)=0,$$
+    <p class="muted" style="margin:8px 0 0;font-size:.95rem">
+      with $f \in C_c^\infty(\mathbb{R}^3\times(0,\infty))$, $u$ and $p$ smooth on $[0,1)$ with support in a fixed compact set,
+      $\sup_{t<1}\|u(t)\|_{L^2}<\infty$ and $\limsup_{t\uparrow 1}\|u(t)\|_{L^\infty}=\infty$.
+    </p>
+  </div>
+  <p>
+    In English: a fluid at rest, pushed by a smooth push that switches off before the singular
+    time and vanishes outside a ball, can be made to spin up without bound at a single point
+    while carrying only a bounded amount of energy. No smooth solution with the same force
+    and bounded energy can therefore exist for all time. Compact support gives the periodic
+    version as a corollary, which is alternative (D).
+  </p>
+  <p>
+    The construction has one idea and a great deal of bookkeeping. The idea is that the force
+    is whatever the momentum equation leaves over once you have chosen the flow. The
+    difficulty is to choose a flow that blows up while that leftover stays smooth. The
+    <a href="./residual.html">residual trick</a> page states this precisely and the
+    <a href="./scaling.html">scales</a>, <a href="./core.html">core</a>,
+    <a href="./pulses.html">pulses</a> and <a href="./corrections.html">corrections</a> pages
+    follow the paper's own order.
+  </p>
+
+  <h2 id="claimed">Scope</h2>
+  <p>
+    The theorem settles the forced alternatives (C) and (D). The unforced alternatives (A) and
+    (B), which is what most people mean by the regularity problem, are untouched. The force is
+    smooth but it is not real analytic, and Constantin, Ignatova and Vicol have since shown that
+    any construction with this one's anisotropic scaling and axisymmetric core needs a
+    non-analytic force that stays active at the singular point. The Clay Mathematics Institute
+    describes the problem as apparently settled and its evaluation as ongoing. The
+    <a href="./status.html">status</a> page keeps these facts dated.
+  </p>
+
+  <h2 id="fluctuations">The fluctuation question</h2>
+  <p>
+    The construction seeds each pulse with an exponentially small force and lets the background
+    shear amplify it. It then cancels the singular part of the residual to every order. Both
+    steps are fine-tuned. A fluid with thermal noise seeds the same instabilities at random
+    phase and with far larger amplitude, a fluid with a molecular scale stops resolving the core
+    once its radius reaches a mean free path, and an equation with transport noise is now known
+    to have global smooth solutions with high probability, force included. None of this finds an
+    error in the proof. All of it bears on whether the proof describes a fluid. The
+    <a href="./fluctuating.html">fluctuations</a> page sorts the candidate modifications by what is
+    proved, the <a href="./scales.html">molecular limit</a> page computes where a real fluid
+    stops following the equations, and the <a href="./seeds.html">seeds</a> page shows the
+    amplification arithmetic.
+  </p>
+
+  <div class="next-steps">
+    <p><strong>Where to start.</strong> Read <a href="./equations.html">the problem</a> for the four
+    alternatives, then <a href="./residual.html">the residual trick</a>. The
+    <a href="./map.html">literature map</a> places the construction among its ancestors, and the
+    <a href="./timeline.html">timeline</a> records September 2026.</p>
+  </div>
+
+  <h2 id="cite">Cite</h2>
+  <div class="bib">
+  <pre style="background:#f3f3f7;padding:12px 14px;border-radius:6px;overflow-x:auto;font-size:0.85em;font-family:'SFMono-Regular',Menlo,Consolas,monospace;">@misc{openai2026navierstokes,
+  title  = {Finite Time Blowup for Navier--Stokes},
+  author = {{OpenAI}},
+  year   = {2026},
+  note   = {Manuscript, 166 pp., released 8 September 2026},
+  url    = {https://openai.com/index/navier-stokes-solution/}
+}</pre>
+  </div>
+  <p class="muted">Comments and corrections are welcome as issues on the <a href="https://github.com/microprediction/navier">repository</a>.</p>
+</main>
+
+  <footer>
+    <a href="https://github.com/microprediction/navier">Source</a> &middot;
+    Maintained by <a href="https://github.com/microprediction">Peter Cotton</a>.
+  </footer>
+</body>
+</html>

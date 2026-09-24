@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>What is settled</title>
+  <meta name="description" content="What the September 2026 construction proves, what it does not, what has been checked, and what has been said, with dates." />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" crossorigin="anonymous">
+  <style>.katex { white-space: nowrap; } .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }</style>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+    onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+  <style>
+    header.site-header nav strong.cur { color:#fff; font-weight:600; display:block; padding:7px 14px; white-space:nowrap; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand" href="./index.html">navier</a>
+    <nav>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-guide">Guide</span><span class="drop" id="menu-guide">
+        <a href="./equations.html">The problem</a>
+        <a href="./residual.html">The residual trick</a>
+        <a href="./scaling.html">Scales and exponents</a>
+        <a href="./core.html">The core</a>
+        <a href="./pulses.html">The annulus and the pulses</a>
+        <a href="./corrections.html">Corrections and completion</a>
+        <strong class="cur">What is settled</strong>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-fluctuations">Fluctuations</span><span class="drop" id="menu-fluctuations">
+        <a href="./fluctuating.html">Can fluctuations break it?</a>
+        <a href="./scales.html">The molecular limit</a>
+        <a href="./seeds.html">Seeds and noise</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-literature">Literature</span><span class="drop" id="menu-literature">
+        <a href="./papers.html">Papers</a>
+        <a href="./bibliography.html">Bibliography</a>
+        <a href="./map.html">Map</a>
+        <a href="./timeline.html">Timeline</a>
+      </span></span>
+      <a href="https://github.com/microprediction/navier">GitHub</a>
+    </nav>
+  </div>
+  <script>
+    (function () {
+      var hdr = document.querySelector('.site-header'), menus = [].slice.call(hdr.querySelectorAll('.menu'));
+      hdr.classList.add('js-menus');
+      function label(m) { return m.querySelector('.menu-label'); }
+      function links(m) { return [].slice.call(m.querySelectorAll('.drop a')); }
+      function isOpen(m) { return m.classList.contains('open'); }
+      function set(m, open, pin) {
+        m.classList.toggle('open', open); m.pinned = open && !!pin;
+        label(m).setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) menus.forEach(function (o) { if (o !== m && isOpen(o)) set(o, false); });
+      }
+      menus.forEach(function (m) {
+        var b = label(m);
+        b.addEventListener('click', function (e) { e.stopPropagation(); set(m, !(isOpen(m) && m.pinned), true); });
+        b.addEventListener('keydown', function (e) {
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowDown') return;
+          e.preventDefault();
+          if (e.key !== 'ArrowDown' && isOpen(m) && m.pinned) { set(m, false); return; }
+          set(m, true, true); links(m)[0].focus();
+        });
+        m.querySelector('.drop').addEventListener('keydown', function (e) {
+          var a = links(m), i = a.indexOf(document.activeElement), n = a.length;
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); a[(i + (e.key === 'ArrowDown' ? 1 : n - 1)) % n].focus(); }
+          else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); a[e.key === 'Home' ? 0 : n - 1].focus(); }
+        });
+        m.addEventListener('mouseenter', function () { if (!isOpen(m)) set(m, true, false); });
+        m.addEventListener('mouseleave', function () { if (isOpen(m) && !m.pinned) set(m, false); });
+        m.addEventListener('focusout', function (e) { if (isOpen(m) && !m.contains(e.relatedTarget)) set(m, false); });
+      });
+      document.addEventListener('click', function (e) { menus.forEach(function (m) { if (isOpen(m) && !m.contains(e.target)) set(m, false); }); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        menus.forEach(function (m) { if (!isOpen(m)) return; var inside = m.contains(document.activeElement); set(m, false); if (inside) label(m).focus(); });
+      });
+    })();
+  </script>
+</header>
+
+<main>
+  <h1>What is settled</h1>
+  <p class="subtitle">Claims, checks, and reactions, with dates. Updated 24 September 2026.</p>
+
+  <p class="lead">
+    The theorem is the forced alternatives (C) and (D) of the Clay statement. The unforced
+    alternatives (A) and (B) are open. Everything else on this page is about how much weight to
+    put on each half of that sentence.
+  </p>
+
+  <h2>Proved</h2>
+  <ul>
+    <li>For every $\nu>0$ there is a smooth, compactly supported force and a smooth
+      compactly supported flow from rest with bounded energy and unbounded velocity at $t=1$.
+      No smooth bounded-energy solution with the same data exists globally. That is alternative
+      (C), and (D) follows by periodization.</li>
+    <li>The singular point is isolated; every derivative of the velocity has a one-sided limit
+      at $t=1$ on compact sets avoiding the origin.</li>
+    <li>The total dissipation on $[0,1)$ is finite.</li>
+    <li>A Lean 4 formalization of the breakdown statements accompanies the paper, in the
+      repository <code>openai/NavierStokesAndEuler</code>, together with a formalized unforced
+      Euler blow-up.</li>
+  </ul>
+
+  <h2>Not proved, and not claimed</h2>
+  <ul>
+    <li>Nothing about unforced initial data. The force is essential to the method and the
+      paper says so.</li>
+    <li>Nothing about turbulence or about any flow one could set up. The force is a
+      construction, not a description of any experiment.</li>
+    <li>Nothing about stability. Whether nearby forces or nearby data blow up is not addressed.
+      Cao, Chi and Nie have since shown that forces producing blow-up are dense in a weak
+      topology, $L^1_tH^s_x$ with $s<1/2$; density is not openness.</li>
+  </ul>
+
+  <h2>Constraints found since</h2>
+  <ul>
+    <li><strong>Constantin, Ignatova and Vicol (17 September 2026).</strong> A solution with the
+      construction's anisotropic Type II bounds on its angular mean and exact axisymmetry in a
+      collapsing core is regular at the putative singular point if the force is real analytic in
+      space near it, locally uniformly in time, and bounded in $C^2$ up to the singular time.
+      Consequently the force in any such construction can neither vanish near the singular point
+      nor be analytic there. The authors state that they have not verified the construction.</li>
+    <li><strong>Duraiswami (15 September 2026).</strong> The core geometry is that of an exact
+      steady swirl between rotating porous cylinders, but that boundary value problem does not
+      recast into the similarity variables, and nothing found suggests the mechanism is reachable
+      in a flow one computes or builds.</li>
+  </ul>
+
+  <h2>Verification</h2>
+  <p>
+    The Lean formalization checks that the formalized proposition follows from the axioms. It
+    does not check that the formalized proposition is Fefferman's, and that step is human. The
+    Clay Mathematics Institute said on 11 September 2026 that the problem has apparently been
+    settled and that its evaluation will be deliberately unhurried; its rules require
+    publication, two years of scrutiny, and broad acceptance. OpenAI has said it will not claim
+    the prize. No independent verification of the manuscript had been announced as of the date
+    above.
+  </p>
+
+  <h2>Priority</h2>
+  <p>
+    C&oacute;rdoba and Mart&iacute;nez-Zoroa established forced blow-up for three-dimensional Euler
+    in 2023 and, with Zheng, for hypodissipative Navier&ndash;Stokes in 2024; Fefferman has called
+    them the heroes of the story. Alp&ouml;ge and Buckmaster obtained smooth-forcing blow-up for
+    Euler on 15 August 2026, verified in Lean a week later, and released it with the porous
+    medium and Boussinesq cases on 7 September, with Coiculescu as coauthor on the porous
+    medium paper. OpenAI's run began on 1 September and its release was 8 September. A dispute
+    over authorship, attribution, and whether product data from the NYU group's Codex sessions
+    could have reached OpenAI's model followed; OpenAI's first paper omitted the
+    C&oacute;rdoba&ndash;Mart&iacute;nez-Zoroa citations and a revision added them. The
+    <a href="./timeline.html">timeline</a> lists the dates. This site takes no position on the
+    dispute beyond recording it.
+  </p>
+
+  <h2>What people have said</h2>
+  <ul>
+    <li>Tao, on the human results of the same week: a remarkable achievement, and a strange
+      and unprecedented decoupling between getting answers and getting understanding. He has
+      also written that it should be possible to do without the forcing term.</li>
+    <li>Silvestre: the Clay problem is settled, but the main problem for the Navier&ndash;Stokes
+      equations is not.</li>
+    <li>C&oacute;rdoba: all fluids we know of are under some kind of external force, so to have
+      the force makes complete sense.</li>
+    <li>Palasek: for unforced Navier&ndash;Stokes, energy loss from viscosity should outweigh the
+      amplification produced by this construction's instabilities.</li>
+    <li>Karniadakis: for air, the singularity appears when the vortex becomes around 70
+      nanometres wide. The <a href="./scales.html">molecular limit</a> page reproduces the
+      arithmetic.</li>
+  </ul>
+
+  <p class="pagenav">Next: <a href="./fluctuating.html">can fluctuations break it?</a></p>
+</main>
+
+  <footer>
+    <a href="https://github.com/microprediction/navier">Source</a> &middot;
+    Maintained by <a href="https://github.com/microprediction">Peter Cotton</a>.
+  </footer>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Literature map</title>
+  <meta name="description" content="An interactive map of the works around the 2026 forced blow-up: lineage, mechanism, constraints, and the gaps." />
+  <link rel="stylesheet" href="./style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <style>
+    header.site-header nav strong.cur { color:#fff; font-weight:600; display:block; padding:7px 14px; white-space:nowrap; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand" href="./index.html">navier</a>
+    <nav>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-guide">Guide</span><span class="drop" id="menu-guide">
+        <a href="./equations.html">The problem</a>
+        <a href="./residual.html">The residual trick</a>
+        <a href="./scaling.html">Scales and exponents</a>
+        <a href="./core.html">The core</a>
+        <a href="./pulses.html">The annulus and the pulses</a>
+        <a href="./corrections.html">Corrections and completion</a>
+        <a href="./status.html">What is settled</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-fluctuations">Fluctuations</span><span class="drop" id="menu-fluctuations">
+        <a href="./fluctuating.html">Can fluctuations break it?</a>
+        <a href="./scales.html">The molecular limit</a>
+        <a href="./seeds.html">Seeds and noise</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-literature">Literature</span><span class="drop" id="menu-literature">
+        <a href="./papers.html">Papers</a>
+        <a href="./bibliography.html">Bibliography</a>
+        <strong class="cur">Map</strong>
+        <a href="./timeline.html">Timeline</a>
+      </span></span>
+      <a href="https://github.com/microprediction/navier">GitHub</a>
+    </nav>
+  </div>
+  <script>
+    (function () {
+      var hdr = document.querySelector('.site-header'), menus = [].slice.call(hdr.querySelectorAll('.menu'));
+      hdr.classList.add('js-menus');
+      function label(m) { return m.querySelector('.menu-label'); }
+      function links(m) { return [].slice.call(m.querySelectorAll('.drop a')); }
+      function isOpen(m) { return m.classList.contains('open'); }
+      function set(m, open, pin) {
+        m.classList.toggle('open', open); m.pinned = open && !!pin;
+        label(m).setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) menus.forEach(function (o) { if (o !== m && isOpen(o)) set(o, false); });
+      }
+      menus.forEach(function (m) {
+        var b = label(m);
+        b.addEventListener('click', function (e) { e.stopPropagation(); set(m, !(isOpen(m) && m.pinned), true); });
+        b.addEventListener('keydown', function (e) {
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowDown') return;
+          e.preventDefault();
+          if (e.key !== 'ArrowDown' && isOpen(m) && m.pinned) { set(m, false); return; }
+          set(m, true, true); links(m)[0].focus();
+        });
+        m.querySelector('.drop').addEventListener('keydown', function (e) {
+          var a = links(m), i = a.indexOf(document.activeElement), n = a.length;
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); a[(i + (e.key === 'ArrowDown' ? 1 : n - 1)) % n].focus(); }
+          else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); a[e.key === 'Home' ? 0 : n - 1].focus(); }
+        });
+        m.addEventListener('mouseenter', function () { if (!isOpen(m)) set(m, true, false); });
+        m.addEventListener('mouseleave', function () { if (isOpen(m) && !m.pinned) set(m, false); });
+        m.addEventListener('focusout', function (e) { if (isOpen(m) && !m.contains(e.relatedTarget)) set(m, false); });
+      });
+      document.addEventListener('click', function (e) { menus.forEach(function (m) { if (isOpen(m) && !m.contains(e.target)) set(m, false); }); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        menus.forEach(function (m) { if (!isOpen(m)) return; var inside = m.contains(document.activeElement); set(m, false); if (inside) label(m).focus(); });
+      });
+    })();
+  </script>
+</header>
+
+<main style="max-width:1100px">
+  <h1>Literature map</h1>
+  <p class="subtitle">The construction as a hub, its ancestors by strand, and the connections that do not yet exist. Drag nodes; hover for summaries; click to open.</p>
+  <style>
+    #map { width: 100%; height: 640px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel); }
+    .node circle { stroke: #fff; stroke-width: 1.5px; cursor: pointer; }
+    .node text { font: 11.5px system-ui, sans-serif; fill: #1a1a1a; pointer-events: none; }
+    .node.hub text { font-weight: 600; font-size: 12.5px; }
+    .link { stroke-width: 1.6px; fill: none; }
+    .link.gap { stroke: #e34948; stroke-dasharray: 6 4; }
+    .elabel { font: italic 10.5px system-ui, sans-serif; fill: #777; pointer-events: none; }
+    .tip { position: absolute; background: #1f1d3d; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 12.5px; max-width: 320px; pointer-events: none; opacity: 0; transition: opacity .12s; line-height: 1.4; }
+    .legend { display: flex; gap: 22px; flex-wrap: wrap; font-size: .9rem; color: var(--muted); margin: 8px 0 0; align-items: center; }
+    .legend .sw { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: middle; margin-right: 5px; }
+    .legend .ln { display: inline-block; width: 26px; border-top: 2px solid #9a9a9a; vertical-align: middle; margin-right: 5px; }
+    .legend .ln.gap { border-top: 2px dashed #e34948; }
+  </style>
+  <div style="position:relative">
+    <svg id="map"></svg>
+    <div class="tip" id="tip"></div>
+  </div>
+  <div class="legend">
+    <span><span class="sw" style="background:#1f1d3d"></span>the construction</span>
+    <span><span class="sw" style="background:#2a78d6"></span>forced blow-up line</span>
+    <span><span class="sw" style="background:#eb6834"></span>classical bounds</span>
+    <span><span class="sw" style="background:#1baf7a"></span>waves and stress</span>
+    <span><span class="sw" style="background:#9a9a9a"></span>fluctuating fluids</span>
+    <span><span class="ln"></span>established relation</span>
+    <span><span class="ln gap"></span>connection that does not yet exist</span>
+  </div>
+  <p class="muted" style="font-size:.92rem">
+    Dashed red edges are the gaps: the unforced problem the construction does not touch, the
+    fixed-noise theorem nobody has, the thermal computation nobody has run. The
+    <a href="./bibliography.html">bibliography</a> annotates every node.
+  </p>
+
+  <script>
+  (function(){
+    var C={hub:'#1f1d3d',line:'#2a78d6',cls:'#eb6834',wave:'#1baf7a',fluc:'#9a9a9a'};
+    var nodes=[
+      {id:'openai',label:'OpenAI 2026',g:'hub',x:550,y:320,r:16,url:'https://cdn.openai.com/pdf/32d9f210-8b73-45e0-91bc-82a30aef8a9a/navier-stokes.pdf',s:'Forced blow-up for 3D Navier–Stokes at every viscosity: smooth compactly supported force, bounded energy, unbounded velocity at t = 1.'},
+      {id:'cmz',label:'Córdoba & Martínez-Zoroa 2023',g:'line',x:300,y:200,url:'https://arxiv.org/abs/2309.08495',s:'Forced 3D Euler singularity by amplification across scales with a Hölder force. The method every 2026 construction descends from.'},
+      {id:'cmzz',label:'Córdoba, Martínez-Zoroa & Zheng 2024',g:'line',x:330,y:300,url:'https://arxiv.org/abs/2407.06776',s:'Same strategy for hypodissipative Navier–Stokes with small fractional dissipation.'},
+      {id:'ab',label:'Alpöge & Buckmaster 2026',g:'line',x:300,y:420,url:'https://arxiv.org/abs/2609.16470',s:'Smooth forcing for IPM, Boussinesq and Euler, with Lean proofs; Euler obtained 15 August 2026.'},
+      {id:'tao',label:'Tao 2016',g:'line',x:420,y:520,url:'https://doi.org/10.1090/jams/838',s:'Blow-up for an averaged Navier–Stokes equation with a modified nonlinearity. Not a forced result; does not transfer.'},
+      {id:'feff',label:'Fefferman 2000',g:'cls',x:800,y:120,url:'https://www.claymath.org/wp-content/uploads/2022/06/navierstokes.pdf',s:'The Clay statement: alternatives (A)–(D). (C) and (D) permit a smooth decaying force.'},
+      {id:'leray',label:'Leray 1934',g:'cls',x:920,y:220,url:'https://doi.org/10.1007/BF02547354',s:'Global weak solutions with the energy inequality.'},
+      {id:'ckn',label:'CKN 1982',g:'cls',x:880,y:330,url:'https://doi.org/10.1002/cpa.3160350604',s:'Singular set has zero 1-D parabolic Hausdorff measure: isolated points allowed.'},
+      {id:'ess',label:'ESS 2003',g:'cls',x:780,y:440,url:'https://doi.org/10.1070/RM2003v058n02ABEH000609',s:'Bounded L³ norm prevents unforced blow-up. The exponent h escapes it.'},
+      {id:'abc',label:'Albritton, Brué & Colombo 2022',g:'wave',x:620,y:130,url:'https://doi.org/10.4007/annals.2022.196.1.3',s:'Nonuniqueness from rest via an unstable vortex in similarity variables; the force is singular at t = 0.'},
+      {id:'cc',label:'Craik & Criminale 1986',g:'wave',x:470,y:100,url:'https://doi.org/10.1098/rspa.1986.0061',s:'Exact waves on affine shear flows; the quadratic self-interaction cancels. The pulses are these, localized and damped.'},
+      {id:'ds',label:'Daneri & Székelyhidi 2017',g:'wave',x:700,y:230,url:'https://doi.org/10.1007/s00205-017-1081-8',s:'Oscillations that realize a prescribed Reynolds stress.'},
+      {id:'civ',label:'Constantin, Ignatova & Vicol 2026',g:'cls',x:680,y:530,url:'https://arxiv.org/abs/2609.20803',s:'Analytic force plus the construction’s bounds implies regularity: the force must be non-analytic and active at the singular point.'},
+      {id:'agresti',label:'Agresti 2026',g:'fluc',x:250,y:560,url:'https://arxiv.org/abs/2607.15140',s:'Transport noise gives global smooth solutions with high probability, including with a smooth force.'},
+      {id:'fl',label:'Flandoli & Luo 2021',g:'fluc',x:140,y:470,url:'https://doi.org/10.1007/s00440-021-01037-5',s:'High-mode transport noise controls vorticity blow-up; scaling limit has eddy viscosity.'},
+      {id:'ll',label:'Landau & Lifshitz 1959',g:'fluc',x:130,y:330,url:'https://doi.org/10.1016/C2013-0-03799-1',s:'Fluctuating hydrodynamics: the random stress fixed by fluctuation-dissipation.'},
+      {id:'braun',label:'Braunstein 2026',g:'fluc',x:150,y:200,url:'https://arxiv.org/abs/2605.21357',s:'Thermal noise plus molecular cutoff: finite-dimensional, globally well posed.'},
+      {id:'homog',label:'Homogenization',g:'fluc',x:120,y:100,url:'https://homogenization.microprediction.org',s:'Averaging a fast exogenous variable; the switching model of the fluctuations page.'},
+      {id:'unforced',label:'Unforced problem (A), (B)',g:'gap',x:960,y:520,url:'./equations.html',s:'Open. The construction says nothing about it.'}
+    ];
+    var links=[
+      {s:'cmz',t:'openai',l:'strategy'},{s:'cmz',t:'cmzz',l:'extends'},{s:'cmzz',t:'openai',l:'toward full viscosity'},{s:'cmz',t:'ab',l:'smooth forcing'},
+      {s:'feff',t:'openai',l:'alternative (C), (D)'},{s:'abc',t:'openai',l:'unstable vortex'},{s:'cc',t:'openai',l:'pulse waves'},{s:'ds',t:'openai',l:'stress by oscillation'},
+      {s:'ckn',t:'openai',l:'isolated point allowed'},{s:'ess',t:'openai',l:'escaped via h'},{s:'leray',t:'ckn',l:'weak solutions'},{s:'openai',t:'civ',l:'force must be non-analytic'},
+      {s:'fl',t:'agresti',l:'transport noise'},{s:'ll',t:'braun',l:'cutoff'},{s:'homog',t:'ll',l:'averaging'},
+      {s:'openai',t:'agresti',l:'noise tuned to force',gap:true},{s:'openai',t:'ll',l:'thermal seeding: not computed',gap:true},{s:'openai',t:'unforced',l:'no bridge',gap:true},{s:'tao',t:'openai',l:'different move',gap:true},{s:'homog',t:'openai',l:'no scaling theorem',gap:true}
+    ];
+    var svg=d3.select('#map'),W=1060,H=640; svg.attr('viewBox','0 0 '+W+' '+H);
+    var byId={}; nodes.forEach(function(n){byId[n.id]=n; n.r=n.r||9;});
+    links.forEach(function(l){l.source=byId[l.s];l.target=byId[l.t];});
+    var sim=d3.forceSimulation(nodes).force('link',d3.forceLink(links).distance(120).strength(0.15)).force('charge',d3.forceManyBody().strength(-160)).force('x',d3.forceX(function(d){return d.x;}).strength(0.35)).force('y',d3.forceY(function(d){return d.y;}).strength(0.35)).force('collide',d3.forceCollide(34)).alphaDecay(0.05);
+    var link=svg.append('g').selectAll('line').data(links).enter().append('line').attr('class',function(d){return 'link'+(d.gap?' gap':'');}).attr('stroke',function(d){return d.gap?null:'#c4c4c4';});
+    var elab=svg.append('g').selectAll('text').data(links).enter().append('text').attr('class','elabel').text(function(d){return d.l;}).attr('text-anchor','middle').style('opacity',0);
+    var node=svg.append('g').selectAll('g').data(nodes).enter().append('g').attr('class',function(d){return 'node'+(d.g==='hub'?' hub':'');}).call(d3.drag().on('start',function(e,d){if(!e.active)sim.alphaTarget(0.3).restart();d.fx=d.x;d.fy=d.y;}).on('drag',function(e,d){d.fx=e.x;d.fy=e.y;}).on('end',function(e,d){if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null;}));
+    node.append('circle').attr('r',function(d){return d.r;}).attr('fill',function(d){return d.g==='gap'?'#fff':C[d.g];}).attr('stroke',function(d){return d.g==='gap'?'#e34948':'#fff';}).attr('stroke-dasharray',function(d){return d.g==='gap'?'4 3':null;});
+    node.append('text').attr('dy',function(d){return d.r+13;}).attr('text-anchor','middle').text(function(d){return d.label;});
+    var tip=d3.select('#tip');
+    node.on('mouseenter',function(e,d){tip.style('opacity',1).html('<b>'+d.label+'</b><br>'+d.s);elab.style('opacity',function(l){return (l.source===d||l.target===d)?1:0;});}).on('mousemove',function(e){var b=document.getElementById('map').getBoundingClientRect();tip.style('left',(e.clientX-b.left+14)+'px').style('top',(e.clientY-b.top+14)+'px');}).on('mouseleave',function(){tip.style('opacity',0);elab.style('opacity',0);}).on('click',function(e,d){window.open(d.url,'_blank');});
+    sim.on('tick',function(){
+      nodes.forEach(function(d){d.x=Math.max(60,Math.min(W-60,d.x));d.y=Math.max(30,Math.min(H-30,d.y));});
+      link.attr('x1',function(d){return d.source.x;}).attr('y1',function(d){return d.source.y;}).attr('x2',function(d){return d.target.x;}).attr('y2',function(d){return d.target.y;});
+      elab.attr('x',function(d){return (d.source.x+d.target.x)/2;}).attr('y',function(d){return (d.source.y+d.target.y)/2-4;});
+      node.attr('transform',function(d){return 'translate('+d.x+','+d.y+')';});
+    });
+  })();
+  </script>
+</main>
+
+  <footer>
+    <a href="https://github.com/microprediction/navier">Source</a> &middot;
+    Maintained by <a href="https://github.com/microprediction">Peter Cotton</a>.
+  </footer>
+</body>
+</html>

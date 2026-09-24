@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>The problem</title>
+  <meta name="description" content="The Navier–Stokes equations, Fefferman's four alternatives, and what breakdown means." />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" crossorigin="anonymous">
+  <style>.katex { white-space: nowrap; } .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }</style>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+    onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+  <style>
+    header.site-header nav strong.cur { color:#fff; font-weight:600; display:block; padding:7px 14px; white-space:nowrap; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand" href="./index.html">navier</a>
+    <nav>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-guide">Guide</span><span class="drop" id="menu-guide">
+        <strong class="cur">The problem</strong>
+        <a href="./residual.html">The residual trick</a>
+        <a href="./scaling.html">Scales and exponents</a>
+        <a href="./core.html">The core</a>
+        <a href="./pulses.html">The annulus and the pulses</a>
+        <a href="./corrections.html">Corrections and completion</a>
+        <a href="./status.html">What is settled</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-fluctuations">Fluctuations</span><span class="drop" id="menu-fluctuations">
+        <a href="./fluctuating.html">Can fluctuations break it?</a>
+        <a href="./scales.html">The molecular limit</a>
+        <a href="./seeds.html">Seeds and noise</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-literature">Literature</span><span class="drop" id="menu-literature">
+        <a href="./papers.html">Papers</a>
+        <a href="./bibliography.html">Bibliography</a>
+        <a href="./map.html">Map</a>
+        <a href="./timeline.html">Timeline</a>
+      </span></span>
+      <a href="https://github.com/microprediction/navier">GitHub</a>
+    </nav>
+  </div>
+  <script>
+    (function () {
+      var hdr = document.querySelector('.site-header'), menus = [].slice.call(hdr.querySelectorAll('.menu'));
+      hdr.classList.add('js-menus');
+      function label(m) { return m.querySelector('.menu-label'); }
+      function links(m) { return [].slice.call(m.querySelectorAll('.drop a')); }
+      function isOpen(m) { return m.classList.contains('open'); }
+      function set(m, open, pin) {
+        m.classList.toggle('open', open); m.pinned = open && !!pin;
+        label(m).setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) menus.forEach(function (o) { if (o !== m && isOpen(o)) set(o, false); });
+      }
+      menus.forEach(function (m) {
+        var b = label(m);
+        b.addEventListener('click', function (e) { e.stopPropagation(); set(m, !(isOpen(m) && m.pinned), true); });
+        b.addEventListener('keydown', function (e) {
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowDown') return;
+          e.preventDefault();
+          if (e.key !== 'ArrowDown' && isOpen(m) && m.pinned) { set(m, false); return; }
+          set(m, true, true); links(m)[0].focus();
+        });
+        m.querySelector('.drop').addEventListener('keydown', function (e) {
+          var a = links(m), i = a.indexOf(document.activeElement), n = a.length;
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); a[(i + (e.key === 'ArrowDown' ? 1 : n - 1)) % n].focus(); }
+          else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); a[e.key === 'Home' ? 0 : n - 1].focus(); }
+        });
+        m.addEventListener('mouseenter', function () { if (!isOpen(m)) set(m, true, false); });
+        m.addEventListener('mouseleave', function () { if (isOpen(m) && !m.pinned) set(m, false); });
+        m.addEventListener('focusout', function (e) { if (isOpen(m) && !m.contains(e.relatedTarget)) set(m, false); });
+      });
+      document.addEventListener('click', function (e) { menus.forEach(function (m) { if (isOpen(m) && !m.contains(e.target)) set(m, false); }); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        menus.forEach(function (m) { if (!isOpen(m)) return; var inside = m.contains(document.activeElement); set(m, false); if (inside) label(m).focus(); });
+      });
+    })();
+  </script>
+</header>
+
+<main>
+  <h1>The problem</h1>
+  <p class="subtitle">The equations, the four alternatives in the Clay statement, and what "blow-up" is allowed to mean.</p>
+
+  <p class="lead">
+    The Millennium problem asks for a proof of one of four statements. Two say that smooth
+    solutions always exist. Two say that they sometimes do not. The construction on this site
+    proves the third and fourth, and the difference between the pairs is a force.
+  </p>
+
+  <h2>The equations</h2>
+  <p>
+    A velocity field $u(x,t)\in\mathbb{R}^3$ and a pressure $p(x,t)$ on $\mathbb{R}^3$ satisfy
+  </p>
+  <div class="equation-card">
+    $$\partial_t u + (u\cdot\nabla)u = \nu\Delta u - \nabla p + f,\qquad \nabla\cdot u = 0,\qquad u(x,0)=u^\circ(x).$$
+  </div>
+  <p>
+    The left side is the acceleration of a fluid parcel: the local rate of change plus the change
+    a parcel sees because it moves. The second piece, $(u\cdot\nabla)u$, is quadratic in $u$, and
+    it is the whole difficulty. The right side is Newton's law: viscous friction, pressure, and an
+    applied force. Incompressibility says the fluid cannot be squeezed in one direction without
+    stretching in another. Setting $\nu=0$ gives Euler.
+  </p>
+  <p>
+    Multiply the equation by $u$ and integrate. The transport and pressure terms vanish, which
+    is the energy identity
+  </p>
+  <div class="equation-card">
+    $$\frac{d}{dt}\,\frac12\int |u|^2\,dx = -\nu\int|\nabla u|^2\,dx + \int f\cdot u\,dx.$$
+  </div>
+  <p>
+    In English: kinetic energy is lost to viscosity and gained only from the force. Without a
+    force the energy can only fall. This is the one estimate everybody has, and it is not enough:
+    in three dimensions bounded energy does not control the velocity pointwise, and the gap
+    between the two is where a singularity could live.
+  </p>
+
+  <h2>The four alternatives</h2>
+  <p>
+    Fefferman's 2000 statement restricts attention to initial data $u^\circ$ that decay with all
+    derivatives faster than any power, and to forces that do the same in space and time. A
+    solution counts as physically reasonable if $u$ and $p$ are $C^\infty$ on
+    $\mathbb{R}^3\times[0,\infty)$ and the energy $\int|u|^2\,dx$ is bounded uniformly in time.
+    The periodic version replaces decay by periodicity. The prize goes to a proof of any one of
+    the following.
+  </p>
+  <div class="table-wrap"><table class="impl">
+    <thead><tr><th>Alt.</th><th>Domain</th><th>Force</th><th>Claim</th></tr></thead>
+    <tbody>
+      <tr><td>(A)</td><td>$\mathbb{R}^3$</td><td>$f\equiv 0$</td><td>For every smooth decaying $u^\circ$, a smooth bounded-energy solution exists for all time.</td></tr>
+      <tr><td>(B)</td><td>$\mathbb{R}^3/\mathbb{Z}^3$</td><td>$f\equiv 0$</td><td>The same on the torus.</td></tr>
+      <tr><td>(C)</td><td>$\mathbb{R}^3$</td><td>smooth, decaying</td><td>There exist $u^\circ$ and $f$ for which no smooth bounded-energy solution exists for all time.</td></tr>
+      <tr><td>(D)</td><td>$\mathbb{R}^3/\mathbb{Z}^3$</td><td>smooth, periodic</td><td>The same on the torus.</td></tr>
+    </tbody>
+  </table></div>
+  <p>
+    Read the table by columns. The existence alternatives fix $f\equiv 0$: they are about the
+    equations alone. The breakdown alternatives allow the prover to choose a force. That
+    asymmetry was written in deliberately, to give leeway to solvers, and it is the asymmetry the
+    2026 construction uses. It proves (C) with $u^\circ = 0$ and a force that is not merely
+    decaying but compactly supported in space and time, and (D) follows by tiling.
+  </p>
+  <p>
+    The pairs are not complementary. (A) false does not mean (C) true, because (C) may be
+    witnessed by a force while (A) fails only through data. Likewise (C) true says nothing about
+    (A). After September 2026 the situation is that (C) and (D) are claimed with a
+    machine-checked proof, and (A) and (B) are open exactly as before.
+  </p>
+
+  <h2>What blow-up means here</h2>
+  <p>
+    For Navier&ndash;Stokes a smooth solution that stops existing at a finite time $T$ must have
+    velocity that becomes unbounded as $t\uparrow T$. That is the sense of breakdown in the
+    theorem: $\limsup_{t\uparrow 1}\|u(t)\|_{L^\infty}=\infty$. The energy stays bounded, and the
+    integrated dissipation $\int_0^1\int|\nabla u|^2$ stays finite, so the singularity is not an
+    energy catastrophe. It is a point where speed concentrates faster than energy can follow.
+  </p>
+  <p>
+    Two known facts bracket what such a point can look like. Caffarelli, Kohn and Nirenberg
+    proved that the singular set of a suitable weak solution has zero one-dimensional parabolic
+    Hausdorff measure, which permits isolated points and nothing larger. Escauriaza, Seregin
+    and &Scaron;ver&aacute;k proved that a solution of the unforced equations with bounded
+    $L^3$ norm cannot blow up. The constructed singularity is one isolated point, and its
+    $L^3$ norm is not bounded: the core has volume of order $\tau^{3/2-h}$ and speed of order
+    $\tau^{-1/2-h}$, so $\int|u|^3$ over the core is of order $\tau^{-4h}$. It escapes the
+    criterion, as it must.
+  </p>
+
+  <h2>Why a force changes everything</h2>
+  <p>
+    With $f\equiv 0$ one has to find a flow that the equations themselves carry to a singularity.
+    With $f$ free one may pick the flow first and let the equations dictate the force. Every
+    incompressible flow solves the forced equations for the right $f$. The question becomes
+    whether the required force can be smooth, and the <a href="./residual.html">next page</a>
+    is about that.
+  </p>
+  <p>
+    This is also why the result is contested as a resolution of the physical problem. Tao's
+    remark that the value of such work lies in insight people can understand, and Silvestre's
+    that the Clay problem is settled but the main problem is not, are both about the force. The
+    <a href="./status.html">status page</a> records who has said what.
+  </p>
+
+  <p class="pagenav">Next: <a href="./residual.html">the residual trick</a>.</p>
+</main>
+
+  <footer>
+    <a href="https://github.com/microprediction/navier">Source</a> &middot;
+    Maintained by <a href="https://github.com/microprediction">Peter Cotton</a>.
+  </footer>
+</body>
+</html>

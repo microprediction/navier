@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>The core</title>
+  <meta name="description" content="The collapsing axisymmetric vortex at the centre of the construction: inflow, spin-up, axial outflow, and the exact heat exterior." />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" crossorigin="anonymous">
+  <style>.katex { white-space: nowrap; } .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }</style>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+    onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+  <style>
+    header.site-header nav strong.cur { color:#fff; font-weight:600; display:block; padding:7px 14px; white-space:nowrap; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand" href="./index.html">navier</a>
+    <nav>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-guide">Guide</span><span class="drop" id="menu-guide">
+        <a href="./equations.html">The problem</a>
+        <a href="./residual.html">The residual trick</a>
+        <a href="./scaling.html">Scales and exponents</a>
+        <strong class="cur">The core</strong>
+        <a href="./pulses.html">The annulus and the pulses</a>
+        <a href="./corrections.html">Corrections and completion</a>
+        <a href="./status.html">What is settled</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-fluctuations">Fluctuations</span><span class="drop" id="menu-fluctuations">
+        <a href="./fluctuating.html">Can fluctuations break it?</a>
+        <a href="./scales.html">The molecular limit</a>
+        <a href="./seeds.html">Seeds and noise</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-literature">Literature</span><span class="drop" id="menu-literature">
+        <a href="./papers.html">Papers</a>
+        <a href="./bibliography.html">Bibliography</a>
+        <a href="./map.html">Map</a>
+        <a href="./timeline.html">Timeline</a>
+      </span></span>
+      <a href="https://github.com/microprediction/navier">GitHub</a>
+    </nav>
+  </div>
+  <script>
+    (function () {
+      var hdr = document.querySelector('.site-header'), menus = [].slice.call(hdr.querySelectorAll('.menu'));
+      hdr.classList.add('js-menus');
+      function label(m) { return m.querySelector('.menu-label'); }
+      function links(m) { return [].slice.call(m.querySelectorAll('.drop a')); }
+      function isOpen(m) { return m.classList.contains('open'); }
+      function set(m, open, pin) {
+        m.classList.toggle('open', open); m.pinned = open && !!pin;
+        label(m).setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) menus.forEach(function (o) { if (o !== m && isOpen(o)) set(o, false); });
+      }
+      menus.forEach(function (m) {
+        var b = label(m);
+        b.addEventListener('click', function (e) { e.stopPropagation(); set(m, !(isOpen(m) && m.pinned), true); });
+        b.addEventListener('keydown', function (e) {
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowDown') return;
+          e.preventDefault();
+          if (e.key !== 'ArrowDown' && isOpen(m) && m.pinned) { set(m, false); return; }
+          set(m, true, true); links(m)[0].focus();
+        });
+        m.querySelector('.drop').addEventListener('keydown', function (e) {
+          var a = links(m), i = a.indexOf(document.activeElement), n = a.length;
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); a[(i + (e.key === 'ArrowDown' ? 1 : n - 1)) % n].focus(); }
+          else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); a[e.key === 'Home' ? 0 : n - 1].focus(); }
+        });
+        m.addEventListener('mouseenter', function () { if (!isOpen(m)) set(m, true, false); });
+        m.addEventListener('mouseleave', function () { if (isOpen(m) && !m.pinned) set(m, false); });
+        m.addEventListener('focusout', function (e) { if (isOpen(m) && !m.contains(e.relatedTarget)) set(m, false); });
+      });
+      document.addEventListener('click', function (e) { menus.forEach(function (m) { if (isOpen(m) && !m.contains(e.target)) set(m, false); }); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        menus.forEach(function (m) { if (!isOpen(m)) return; var inside = m.contains(document.activeElement); set(m, false); if (inside) label(m).focus(); });
+      });
+    })();
+  </script>
+</header>
+
+<main>
+  <h1>The core</h1>
+  <p class="subtitle">A vortex that spirals inward, spins up by conservation of angular momentum, and expels fluid along its axis.</p>
+
+  <p class="lead">
+    The leading flow is axisymmetric and lives in three regions: a concentrating inner core, an
+    annulus where the core is joined to the outside, and a heat exterior. The core is where the
+    speed diverges. This page is about why it can.
+  </p>
+
+  <h2>Spin-up</h2>
+  <p>
+    A fluid parcel that feels no torque conserves its angular momentum per unit mass, $r u_\theta$.
+    Carry it inward and its swirl grows like $1/r$. This is the bathtub vortex, and it is the only
+    amplifying mechanism the construction needs in the core. Inflow carries angular momentum
+    toward the axis; viscosity diffuses it back out; the balance of the two sets the rate at
+    which the characteristic speed grows.
+  </p>
+  <p>
+    Inflow cannot continue unless the fluid goes somewhere. Incompressibility forbids piling up
+    on the axis, so the core has axial outflow: fluid arriving at small radius leaves upward on
+    one side of a dividing layer near $z=0$ and downward on the other. The pressure gradient
+    points toward the axis, supplying the centripetal force for the swirl, and its axial
+    component points toward the mid-plane.
+  </p>
+
+  <h2>Symmetry, deliberately broken</h2>
+  <p>
+    The obvious profile would be reflection-symmetric in $z$. The paper does not use it. On the
+    mid-plane $z=0$ an exactly symmetric axial flow vanishes, and with it the radial shear of
+    axial velocity that the pulses in the annulus need for their amplification. Away from the
+    mid-plane, axial transport of angular momentum supplies a steep radial fall in angular
+    velocity, and the rotational mechanism amplifies pulses on its own. The profile is therefore
+    given a small upward bias with nonzero axial velocity at $z=0$. This separates the layer where
+    rotational amplification is weak from the layer where axial shear vanishes, so that at every
+    height at least one mechanism is active.
+  </p>
+
+  <h2>The profile equations</h2>
+  <p>
+    In the similarity variables of the <a href="./scaling.html">scales page</a>, the leading
+    velocity is
+  </p>
+  <div class="equation-card">
+    $$u^{(0)} = \frac{V_0}{r}\,e_r + q^{-A}E\,e_\theta + q^{-A}U\,e_z,\qquad p^{(0)} = q^{-2A}\Pi,\qquad
+      \Pi(X,\eta) = -\int_X^\infty \frac{E(x,\eta)^2}{2x}\,dx .$$
+  </div>
+  <p>
+    The pressure formula is the radial balance $\partial_r p = u_\theta^2/r$, integrated in from
+    infinity. The radial flux $V_0$ is fixed by incompressibility from $U$. What remains is to
+    choose $E$ and $U$ so that the tangential momentum equations, azimuthal and axial, hold to
+    leading order in the core. The paper solves these near the axis as an analytic problem in
+    $(X,\eta)$, with $E/\sqrt{2X}$ and $U$ smooth at $X=0$, which is what makes the Cartesian
+    field smooth on the axis for every $t<1$. Regularity on the axis is not automatic in
+    cylindrical coordinates and the construction pays for it throughout: every correction is
+    built from vector potentials whose curl is smooth there.
+  </p>
+  <p>
+    A single displayed fact carries the theorem. For a fixed $X_{\rm in}$ inside the core,
+  </p>
+  <div class="equation-card">
+    $$u_\theta\!\left(\sqrt{2X_{\rm in}\tau},\,0,\,0,\ 1-\tau\right) = \tau^{-A}\big(e_0 + O(\tau^{2h})\big)\longrightarrow +\infty,\qquad e_0>0 .$$
+  </div>
+  <p>
+    In English: on the circle of radius $\sqrt{2X_{\rm in}\tau}$ in the mid-plane, the swirl grows
+    like $\tau^{-1/2-h}$ with a definite positive coefficient. Everything added later, pulses and
+    corrections, vanishes in this fixed inner region or is smaller by powers of $\tau$. The
+    localization cutoffs equal one there. So the final velocity inherits this growth, and this
+    is the line the proof of Theorem 1.1 points to when it says the solution is unbounded.
+  </p>
+
+  <h2>The heat exterior</h2>
+  <p>
+    Beyond the annulus the flow is pure swirl, independent of height: $u = K(r,\tau)\,e_\theta$
+    with
+  </p>
+  <div class="equation-card">
+    $$-\partial_\tau K = \partial_r^2 K + r^{-1}\partial_r K - r^{-2}K,\qquad K(r,\tau) = r^{-1-2h}H_{\rm ext}(\tau/r^2).$$
+  </div>
+  <p>
+    This is the azimuthal component of the Stokes equations, a radial heat equation for the
+    swirl. It is solved exactly, so its residual is zero and no force is needed there. Its profile
+    decays like $r^{-1-2h}$ at large radius, matching the core's $E\sim c_\infty X^{-1/2-h}$, and
+    at every fixed positive radius the field and all its derivatives have smooth limits as
+    $\tau\downarrow 0$. That last property is what allows the whole flow to be cut off smoothly in
+    space without disturbing the concentrating core, and it is why the singular point is
+    isolated.
+  </p>
+
+  <h2>The annulus is the problem</h2>
+  <p>
+    Joining an inner profile that satisfies its own balance to an exterior that satisfies a
+    different one leaves a mismatch. Write the tangential residuals of the leading field as
+    $R_\theta^{(0)}$ and $R_z^{(0)}$, retaining radial viscosity and omitting axial viscosity,
+    which is smaller by $\tau^{2h}$. The paper writes them as divergences of a stress:
+  </p>
+  <div class="equation-card">
+    $$R_\theta^{(0)} = -(\partial_r + 2/r)\,T_{r\theta},\qquad R_z^{(0)} = -(\partial_r + 1/r)\,T_{rz},$$
+  </div>
+  <p>
+    with $T$ obtained by integrating the residuals in from the axis. Five radial moment
+    conditions, matched at the join, make $T$ vanish inside the core and outside the exterior
+    radius, so the stress is supported in an annulus $X_a < X < X_b$ and nowhere else. The
+    background residual there scales like $q^{-3/2-h}$ and does not extend through $\tau=0$. It
+    has to be supplied by something that is not an external force. The
+    <a href="./pulses.html">next page</a> is about the something.
+  </p>
+
+  <p class="pagenav">Next: <a href="./pulses.html">the annulus and the pulses</a>.</p>
+</main>
+
+  <footer>
+    <a href="https://github.com/microprediction/navier">Source</a> &middot;
+    Maintained by <a href="https://github.com/microprediction">Peter Cotton</a>.
+  </footer>
+</body>
+</html>

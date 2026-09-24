@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>The residual trick</title>
+  <meta name="description" content="Choose the flow, define the force as what the momentum equation leaves over, and make that leftover smooth." />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" crossorigin="anonymous">
+  <style>.katex { white-space: nowrap; } .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }</style>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+    onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+  <style>
+    header.site-header nav strong.cur { color:#fff; font-weight:600; display:block; padding:7px 14px; white-space:nowrap; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand" href="./index.html">navier</a>
+    <nav>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-guide">Guide</span><span class="drop" id="menu-guide">
+        <a href="./equations.html">The problem</a>
+        <strong class="cur">The residual trick</strong>
+        <a href="./scaling.html">Scales and exponents</a>
+        <a href="./core.html">The core</a>
+        <a href="./pulses.html">The annulus and the pulses</a>
+        <a href="./corrections.html">Corrections and completion</a>
+        <a href="./status.html">What is settled</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-fluctuations">Fluctuations</span><span class="drop" id="menu-fluctuations">
+        <a href="./fluctuating.html">Can fluctuations break it?</a>
+        <a href="./scales.html">The molecular limit</a>
+        <a href="./seeds.html">Seeds and noise</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-literature">Literature</span><span class="drop" id="menu-literature">
+        <a href="./papers.html">Papers</a>
+        <a href="./bibliography.html">Bibliography</a>
+        <a href="./map.html">Map</a>
+        <a href="./timeline.html">Timeline</a>
+      </span></span>
+      <a href="https://github.com/microprediction/navier">GitHub</a>
+    </nav>
+  </div>
+  <script>
+    (function () {
+      var hdr = document.querySelector('.site-header'), menus = [].slice.call(hdr.querySelectorAll('.menu'));
+      hdr.classList.add('js-menus');
+      function label(m) { return m.querySelector('.menu-label'); }
+      function links(m) { return [].slice.call(m.querySelectorAll('.drop a')); }
+      function isOpen(m) { return m.classList.contains('open'); }
+      function set(m, open, pin) {
+        m.classList.toggle('open', open); m.pinned = open && !!pin;
+        label(m).setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) menus.forEach(function (o) { if (o !== m && isOpen(o)) set(o, false); });
+      }
+      menus.forEach(function (m) {
+        var b = label(m);
+        b.addEventListener('click', function (e) { e.stopPropagation(); set(m, !(isOpen(m) && m.pinned), true); });
+        b.addEventListener('keydown', function (e) {
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowDown') return;
+          e.preventDefault();
+          if (e.key !== 'ArrowDown' && isOpen(m) && m.pinned) { set(m, false); return; }
+          set(m, true, true); links(m)[0].focus();
+        });
+        m.querySelector('.drop').addEventListener('keydown', function (e) {
+          var a = links(m), i = a.indexOf(document.activeElement), n = a.length;
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); a[(i + (e.key === 'ArrowDown' ? 1 : n - 1)) % n].focus(); }
+          else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); a[e.key === 'Home' ? 0 : n - 1].focus(); }
+        });
+        m.addEventListener('mouseenter', function () { if (!isOpen(m)) set(m, true, false); });
+        m.addEventListener('mouseleave', function () { if (isOpen(m) && !m.pinned) set(m, false); });
+        m.addEventListener('focusout', function (e) { if (isOpen(m) && !m.contains(e.relatedTarget)) set(m, false); });
+      });
+      document.addEventListener('click', function (e) { menus.forEach(function (m) { if (isOpen(m) && !m.contains(e.target)) set(m, false); }); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        menus.forEach(function (m) { if (!isOpen(m)) return; var inside = m.contains(document.activeElement); set(m, false); if (inside) label(m).focus(); });
+      });
+    })();
+  </script>
+</header>
+
+<main>
+  <h1>The residual trick</h1>
+  <p class="subtitle">Choose the flow first. The force is whatever the equation leaves over. The whole proof is making the leftover smooth.</p>
+
+  <p class="lead">
+    For any divergence-free $u$ and any $p$, define
+  </p>
+  <div class="equation-card">
+    $$\mathcal{R}(u,p) := \partial_t u + (u\cdot\nabla)u - \nu\Delta u + \nabla p .$$
+  </div>
+  <p>
+    Set $f := \mathcal{R}(u,p)$. Then $(u,p,f)$ solves the forced Navier&ndash;Stokes equations,
+    by definition. There is nothing to prove about existence. What must be proved is that a
+    $u$ exists which becomes unbounded at time one while $\mathcal{R}(u,p)$, together with
+    every space-time derivative of it, extends smoothly through time one. The paper calls
+    $\mathcal{R}$ the momentum residual, and the entire construction is an exercise in
+    cancellation inside it.
+  </p>
+
+  <h2>Why the obvious flows fail</h2>
+  <p>
+    Take any self-similar profile that concentrates, say $u(x,t) = \tau^{-1/2}U(x/\tau^{1/2})$
+    with $\tau=1-t$. Each term of the residual scales like $\tau^{-3/2}$. The residual of a
+    generic profile therefore diverges like $\tau^{-3/2}$ at the singular point, and the force
+    needed to sustain the flow is as singular as the flow. Nothing is gained.
+  </p>
+  <p>
+    The way out is to make the terms cancel. Individual terms may diverge; the sum must not. In
+    the inner core the construction imposes the leading momentum balance exactly, so the
+    residual there is small by design. In the exterior the flow is an exact solution of a heat
+    equation, so the residual is zero. The trouble is in between, in the annulus where the
+    concentrating core is joined to the smooth exterior. There the residual of the background is
+    unbounded, of the same order as the terms it is built from, and no choice of axisymmetric
+    profile removes it.
+  </p>
+
+  <h2>Momentum that the fluid supplies to itself</h2>
+  <p>
+    The paper's central move is to let the fluid supply the missing force. Add to the background
+    $u_B$ a divergence-free increment $w$ with pressure increment $\pi$. The residual changes by
+    an exact identity:
+  </p>
+  <div class="equation-card">
+    $$\mathcal{R}(u_B + w,\ p_B + \pi) = \mathcal{R}(u_B,p_B) + \mathcal{L}_{u_B}(w,\pi) + \nabla\cdot(w\otimes w),$$
+    $$\mathcal{L}_{u_B}(w,\pi) = \partial_t w + (u_B\cdot\nabla)w + (w\cdot\nabla)u_B - \nu\Delta w + \nabla\pi .$$
+  </div>
+  <p>
+    The linear term is how the increment evolves in the background. The quadratic term is the
+    divergence of a momentum flux, and its angular average does not vanish even when $w$ does.
+    In English: oscillations that average to zero still transport momentum, because the product
+    of two zero-mean quantities has a mean. This is the Reynolds stress of turbulence theory,
+    used here on purpose. Choose $w$ so that $\nabla\cdot\langle w\otimes w\rangle$ cancels the
+    singular part of $\mathcal{R}(u_B,p_B)$, and the leading obstruction is gone.
+  </p>
+  <p>
+    Two conditions make this possible. The increments $w$ must be approximate solutions of the
+    linearized equation, $\mathcal{L}_{u_B}(w,\pi)\approx 0$, otherwise the linear term
+    reintroduces a singular residual. And their averaged flux must be able to point in the
+    direction the background needs. The <a href="./pulses.html">pulses page</a> explains how
+    both are arranged.
+  </p>
+
+  <h2>Cancellation to every order</h2>
+  <p>
+    Cancelling the leading term leaves smaller singular terms: interactions between pulses,
+    the errors of the linearization, cutoffs. The construction removes these in a fixed cycle,
+    recomputing the full residual after every operation so that nothing is dropped. Each cycle
+    improves the rate at which the residual vanishes by a fixed amount, $\sigma_{j+1}=\sigma_j+\tfrac1{10}$.
+    The corrections are then summed with cutoffs that shrink toward the singular point. The
+    outcome is a residual that is flat: every Cartesian space-time derivative is
+    $O(q^N)$ for every $N$ as the concentration scale $q\downarrow 0$. A flat function extends
+    by zero smoothly. That is where the smooth force comes from.
+  </p>
+  <p>
+    Note what this does not require. The force need not be small, and it need not be simple.
+    It is $C^\infty$ and compactly supported, and that is all the theorem asks. It is not
+    real analytic, and it cannot be: Constantin, Ignatova and Vicol prove that a force analytic
+    in space near the singular point forces regularity for flows of this type. The construction
+    lives in the difference between smooth and analytic.
+  </p>
+
+  <h2>Ancestry</h2>
+  <p>
+    The trick is not new. C&oacute;rdoba and Mart&iacute;nez-Zoroa built finite-time singularities
+    for forced three-dimensional Euler in 2023 by amplifying increasingly concentrated vortex
+    layers while keeping the force in a fixed H&ouml;lder class, and with Zheng extended the method
+    to hypodissipative Navier&ndash;Stokes in 2024. Alp&ouml;ge and Buckmaster pushed the method to
+    smooth forcing for the porous medium, Boussinesq and Euler equations in August 2026. Tao's
+    2016 blow-up for an averaged Navier&ndash;Stokes equation is a different move: it modifies the
+    nonlinearity rather than adding a force. The <a href="./map.html">map</a> draws the lineage.
+  </p>
+  <p>
+    What the 2026 construction adds is viscosity at full strength. Earlier forced constructions
+    had none, or a small fractional power of it. Here the radial Reynolds number of the core is
+    $O(1)$: viscous diffusion competes with inflow at every stage, and the pulses that supply the
+    stress are damped by the same viscosity that they must outrun. The
+    <a href="./scaling.html">scales page</a> makes those competitions quantitative.
+  </p>
+
+  <p class="pagenav">Next: <a href="./scaling.html">scales and exponents</a>.</p>
+</main>
+
+  <footer>
+    <a href="https://github.com/microprediction/navier">Source</a> &middot;
+    Maintained by <a href="https://github.com/microprediction">Peter Cotton</a>.
+  </footer>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Papers</title>
+  <meta name="description" content="The September 2026 blow-up constructions and the papers that responded to them." />
+  <link rel="stylesheet" href="./style.css" />
+  <style>
+    header.site-header nav strong.cur { color:#fff; font-weight:600; display:block; padding:7px 14px; white-space:nowrap; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand" href="./index.html">navier</a>
+    <nav>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-guide">Guide</span><span class="drop" id="menu-guide">
+        <a href="./equations.html">The problem</a>
+        <a href="./residual.html">The residual trick</a>
+        <a href="./scaling.html">Scales and exponents</a>
+        <a href="./core.html">The core</a>
+        <a href="./pulses.html">The annulus and the pulses</a>
+        <a href="./corrections.html">Corrections and completion</a>
+        <a href="./status.html">What is settled</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-fluctuations">Fluctuations</span><span class="drop" id="menu-fluctuations">
+        <a href="./fluctuating.html">Can fluctuations break it?</a>
+        <a href="./scales.html">The molecular limit</a>
+        <a href="./seeds.html">Seeds and noise</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-literature">Literature</span><span class="drop" id="menu-literature">
+        <strong class="cur">Papers</strong>
+        <a href="./bibliography.html">Bibliography</a>
+        <a href="./map.html">Map</a>
+        <a href="./timeline.html">Timeline</a>
+      </span></span>
+      <a href="https://github.com/microprediction/navier">GitHub</a>
+    </nav>
+  </div>
+  <script>
+    (function () {
+      var hdr = document.querySelector('.site-header'), menus = [].slice.call(hdr.querySelectorAll('.menu'));
+      hdr.classList.add('js-menus');
+      function label(m) { return m.querySelector('.menu-label'); }
+      function links(m) { return [].slice.call(m.querySelectorAll('.drop a')); }
+      function isOpen(m) { return m.classList.contains('open'); }
+      function set(m, open, pin) {
+        m.classList.toggle('open', open); m.pinned = open && !!pin;
+        label(m).setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) menus.forEach(function (o) { if (o !== m && isOpen(o)) set(o, false); });
+      }
+      menus.forEach(function (m) {
+        var b = label(m);
+        b.addEventListener('click', function (e) { e.stopPropagation(); set(m, !(isOpen(m) && m.pinned), true); });
+        b.addEventListener('keydown', function (e) {
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowDown') return;
+          e.preventDefault();
+          if (e.key !== 'ArrowDown' && isOpen(m) && m.pinned) { set(m, false); return; }
+          set(m, true, true); links(m)[0].focus();
+        });
+        m.querySelector('.drop').addEventListener('keydown', function (e) {
+          var a = links(m), i = a.indexOf(document.activeElement), n = a.length;
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); a[(i + (e.key === 'ArrowDown' ? 1 : n - 1)) % n].focus(); }
+          else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); a[e.key === 'Home' ? 0 : n - 1].focus(); }
+        });
+        m.addEventListener('mouseenter', function () { if (!isOpen(m)) set(m, true, false); });
+        m.addEventListener('mouseleave', function () { if (isOpen(m) && !m.pinned) set(m, false); });
+        m.addEventListener('focusout', function (e) { if (isOpen(m) && !m.contains(e.relatedTarget)) set(m, false); });
+      });
+      document.addEventListener('click', function (e) { menus.forEach(function (m) { if (isOpen(m) && !m.contains(e.target)) set(m, false); }); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        menus.forEach(function (m) { if (!isOpen(m)) return; var inside = m.contains(document.activeElement); set(m, false); if (inside) label(m).focus(); });
+      });
+    })();
+  </script>
+</header>
+
+<main>
+  <h1>Papers</h1>
+  <p class="subtitle">The constructions of September 2026 and the responses. The <a href="./bibliography.html">bibliography</a> places them among the classics.</p>
+
+  <div class="bib">
+    <h2>The construction</h2>
+    <ul>
+      <li id="openai2026">
+        OpenAI (2026). <em>Finite Time Blowup for Navier&ndash;Stokes</em>. Manuscript, 166 pp., released 8 September 2026.
+        <a href="https://cdn.openai.com/pdf/32d9f210-8b73-45e0-91bc-82a30aef8a9a/navier-stokes.pdf">PDF</a> &middot;
+        <a href="https://openai.com/index/navier-stokes-solution/">announcement</a> &middot;
+        <a href="https://github.com/openai/NavierStokesAndEuler">Lean</a>.<br>
+        <span class="muted">For every positive viscosity, a smooth compactly supported force under which the flow from rest has bounded energy and unbounded velocity at time one; alternatives (C) and (D) of the Clay statement. An anisotropic self-similar swirl core, an annulus of shear-amplified pulses whose Reynolds stress supplies the singular residual, and a correction cycle that makes the leftover force flat. The <a href="./residual.html">guide</a> follows its Sections 2, 3 and 10.</span>
+      </li>
+    </ul>
+
+    <h2>The human line</h2>
+    <ul>
+      <li id="cmz2023">
+        C&oacute;rdoba, D. and Mart&iacute;nez-Zoroa, L. (2023). <em>Blow-up for the incompressible 3D-Euler equations with uniform $C^{1,1/2-\epsilon}\cap L^2$ force</em>. To appear, Duke Mathematical Journal. <a href="https://arxiv.org/abs/2309.08495">arXiv:2309.08495</a>.<br>
+        <span class="muted">The forced blow-up strategy: larger-scale strain amplifies smaller-scale vorticity across scales while the force stays in a fixed H&ouml;lder class. The ancestor of every 2026 construction.</span>
+      </li>
+      <li id="cmzz2024">
+        C&oacute;rdoba, D., Mart&iacute;nez-Zoroa, L. and Zheng, F. (2024). <em>Finite time blow-up for the hypodissipative Navier&ndash;Stokes equations with a force in $L^1_tC^{1,\epsilon}_x\cap L^\infty_tL^2_x$</em>. <a href="https://arxiv.org/abs/2407.06776">arXiv:2407.06776</a>.<br>
+        <span class="muted">Extends the method to small fractional dissipation. The full Laplacian was the remaining obstacle.</span>
+      </li>
+      <li id="abc2026">
+        Alp&ouml;ge, L., Buckmaster, T. and Coiculescu, M. P. (2026). <em>Extending the C&oacute;rdoba&ndash;Mart&iacute;nez-Zoroa IPM Blow-Up to Uniformly Space-Time Smooth Forcing</em>. <a href="https://arxiv.org/abs/2609.16470">arXiv:2609.16470</a>, with Lean files at <a href="https://github.com/tristanbuckmaster/fluid_lean">fluid_lean</a>.<br>
+        <span class="muted">Smooth forcing for the incompressible porous medium equation. Companion preprints, released 7 September 2026, treat two-dimensional Boussinesq and three-dimensional Euler. The authors record heavy use of Claude and Codex and that their Euler result was obtained on 15 August 2026.</span>
+      </li>
+    </ul>
+
+    <h2>Responses</h2>
+    <ul>
+      <li id="civ2026">
+        Constantin, P., Ignatova, M. and Vicol, V. (2026). <em>Regularity of asymptotically axisymmetric solutions to the 3D Navier&ndash;Stokes equations with analytic forcing</em>. <a href="https://arxiv.org/abs/2609.20803">arXiv:2609.20803</a>, 17 September 2026.<br>
+        <span class="muted">Under the construction's anisotropic Type II bounds and an exactly axisymmetric core, a force that is real analytic in space near the singular point implies regularity there. So the force of any such construction can neither vanish near the singular point nor be analytic. The sharpest statement to date of where the construction lives.</span>
+      </li>
+      <li id="ccn2026">
+        Cao, S., Chi, Z. and Nie, P. (2026). <em>Density of Forces Producing Navier&ndash;Stokes Blowup</em>. <a href="https://arxiv.org/abs/2609.10262">arXiv:2609.10262</a>, 9 September 2026.<br>
+        <span class="muted">Starting from the OpenAI solution, constructs blow-up near any smooth solution with the same initial velocity by a cutoff of a local vector potential; the blow-up forces are dense in $L^1_tH^s_x$ for $s<1/2$. Density, not openness.</span>
+      </li>
+      <li id="duraiswami2026">
+        Duraiswami, R. (2026). <em>Self-similar swirl between contracting porous walls: the GD1998 exact Navier&ndash;Stokes solution revisited in the similarity variables of the OpenAI 2026 forced blow-up construction</em>. <a href="https://arxiv.org/abs/2609.17642">arXiv:2609.17642</a>.<br>
+        <span class="muted">The core geometry matches an exact steady swirl between rotating porous cylinders, but the boundary value problem does not recast into the similarity variables, and nothing suggests the mechanism is reachable in a flow one computes or builds.</span>
+      </li>
+      <li id="agresti2026">
+        Agresti, A. (2026). <em>On the absence of blow-up in the 3D Navier&ndash;Stokes equations with transport noise</em>. <a href="https://arxiv.org/abs/2607.15140">arXiv:2607.15140</a>, v4 of 9 September 2026.<br>
+        <span class="muted">For data in any ball of a subcritical space there is a transport noise for which the periodic equation has a unique global smooth solution with high probability; Remark 4.4 extends this to a smooth deterministic force. The one theorem on this site under which the constructed singularity is known not to survive.</span>
+      </li>
+      <li id="braunstein2026">
+        Braunstein, S. L. (2026). <em>Physical completion of the Navier&ndash;Stokes equations</em>. <a href="https://arxiv.org/abs/2605.21357">arXiv:2605.21357</a>.<br>
+        <span class="muted">Thermal noise plus a molecular spectral cutoff turn the equations into a finite-dimensional stochastic system with a Lyapunov function, globally well posed. A statement about the fluid rather than the PDE.</span>
+      </li>
+    </ul>
+
+    <h2>Commentary</h2>
+    <ul>
+      <li>Tao, T. (2026). <em>Finite time blowup with smooth forcing term for the incompressible porous medium, Boussinesq, and incompressible Euler equations</em>. Blog post, 7 September 2026. <a href="https://terrytao.wordpress.com/2026/09/07/finite-time-blowup-with-smooth-forcing-term-for-the-incompressible-porous-medium-boussinesq-and-incompressible-euler-equations/">link</a>.<br>
+        <span class="muted">The iterative low-frequency, high-frequency mechanism explained in a page, and the remark that it should be possible to do without the forcing term.</span></li>
+      <li>Fefferman, C. L. (2000). <em>Existence and smoothness of the Navier&ndash;Stokes equation</em>. Clay Mathematics Institute. <a href="https://www.claymath.org/wp-content/uploads/2022/06/navierstokes.pdf">PDF</a>.<br>
+        <span class="muted">The four alternatives, with the decay conditions on data and force. Read it before reading anything about who solved what.</span></li>
+    </ul>
+  </div>
+
+  <h2>This site</h2>
+  <p>
+    The site has no paper of its own yet. The <a href="./fluctuating.html">fluctuations</a>
+    pages are a working note; the <a href="./seeds.html">seeds</a> page ends with a computation
+    that could become one.
+  </p>
+</main>
+
+  <footer>
+    <a href="https://github.com/microprediction/navier">Source</a> &middot;
+    Maintained by <a href="https://github.com/microprediction">Peter Cotton</a>.
+  </footer>
+</body>
+</html>

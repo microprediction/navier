@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>The annulus and the pulses</title>
+  <meta name="description" content="Oscillatory pulses amplified by the background shear supply, through their Reynolds stress, the momentum flux the background lacks." />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="./demos.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" crossorigin="anonymous">
+  <style>.katex { white-space: nowrap; } .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }</style>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+    onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+  <style>
+    header.site-header nav strong.cur { color:#fff; font-weight:600; display:block; padding:7px 14px; white-space:nowrap; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand" href="./index.html">navier</a>
+    <nav>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-guide">Guide</span><span class="drop" id="menu-guide">
+        <a href="./equations.html">The problem</a>
+        <a href="./residual.html">The residual trick</a>
+        <a href="./scaling.html">Scales and exponents</a>
+        <a href="./core.html">The core</a>
+        <strong class="cur">The annulus and the pulses</strong>
+        <a href="./corrections.html">Corrections and completion</a>
+        <a href="./status.html">What is settled</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-fluctuations">Fluctuations</span><span class="drop" id="menu-fluctuations">
+        <a href="./fluctuating.html">Can fluctuations break it?</a>
+        <a href="./scales.html">The molecular limit</a>
+        <a href="./seeds.html">Seeds and noise</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-literature">Literature</span><span class="drop" id="menu-literature">
+        <a href="./papers.html">Papers</a>
+        <a href="./bibliography.html">Bibliography</a>
+        <a href="./map.html">Map</a>
+        <a href="./timeline.html">Timeline</a>
+      </span></span>
+      <a href="https://github.com/microprediction/navier">GitHub</a>
+    </nav>
+  </div>
+  <script>
+    (function () {
+      var hdr = document.querySelector('.site-header'), menus = [].slice.call(hdr.querySelectorAll('.menu'));
+      hdr.classList.add('js-menus');
+      function label(m) { return m.querySelector('.menu-label'); }
+      function links(m) { return [].slice.call(m.querySelectorAll('.drop a')); }
+      function isOpen(m) { return m.classList.contains('open'); }
+      function set(m, open, pin) {
+        m.classList.toggle('open', open); m.pinned = open && !!pin;
+        label(m).setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) menus.forEach(function (o) { if (o !== m && isOpen(o)) set(o, false); });
+      }
+      menus.forEach(function (m) {
+        var b = label(m);
+        b.addEventListener('click', function (e) { e.stopPropagation(); set(m, !(isOpen(m) && m.pinned), true); });
+        b.addEventListener('keydown', function (e) {
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowDown') return;
+          e.preventDefault();
+          if (e.key !== 'ArrowDown' && isOpen(m) && m.pinned) { set(m, false); return; }
+          set(m, true, true); links(m)[0].focus();
+        });
+        m.querySelector('.drop').addEventListener('keydown', function (e) {
+          var a = links(m), i = a.indexOf(document.activeElement), n = a.length;
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); a[(i + (e.key === 'ArrowDown' ? 1 : n - 1)) % n].focus(); }
+          else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); a[e.key === 'Home' ? 0 : n - 1].focus(); }
+        });
+        m.addEventListener('mouseenter', function () { if (!isOpen(m)) set(m, true, false); });
+        m.addEventListener('mouseleave', function () { if (isOpen(m) && !m.pinned) set(m, false); });
+        m.addEventListener('focusout', function (e) { if (isOpen(m) && !m.contains(e.relatedTarget)) set(m, false); });
+      });
+      document.addEventListener('click', function (e) { menus.forEach(function (m) { if (isOpen(m) && !m.contains(e.target)) set(m, false); }); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        menus.forEach(function (m) { if (!isOpen(m)) return; var inside = m.contains(document.activeElement); set(m, false); if (inside) label(m).focus(); });
+      });
+    })();
+  </script>
+</header>
+
+<main>
+  <h1>The annulus and the pulses</h1>
+  <p class="subtitle">Oscillations with zero mean carry momentum with nonzero mean. The construction aims that momentum at the residual.</p>
+
+  <p class="lead">
+    The background residual in the annulus is a stress divergence, singular as $\tau\downarrow 0$.
+    An external force that supplied it would be singular too. So the paper adds a sequence of
+    spatially oscillatory pulses, seeded by an exponentially small force and grown by the
+    background shear, whose averaged momentum flux is the stress the background needs.
+  </p>
+
+  <h2>Zero-mean waves, nonzero-mean flux</h2>
+  <p>
+    Consider fluid at the edge of the core moving outward with a surplus of swirl, and fluid
+    moving inward with a deficit. Both carry angular momentum outward. Reverse both signs and the
+    product $w_r w_\theta$ is unchanged. A pattern of such motions around a complete ring has zero
+    angular average in every component and a definite angular average in its radial flux of
+    azimuthal momentum. The same holds for axial momentum. That is the quantity the annulus is
+    missing, and the leading covariance identity of the construction reads
+  </p>
+  <div class="equation-card">
+    $$\begin{pmatrix}\langle \tilde w_r \tilde w_\theta\rangle\\ \langle \tilde w_r \tilde w_z\rangle\end{pmatrix} = T + \text{higher order},$$
+  </div>
+  <p>
+    where $T=(T_{r\theta},T_{rz})$ is the annular stress of the <a href="./core.html">core page</a>
+    and the bracket is the angular average. The radial divergence of the left side cancels the
+    leading residual of the background. Note the sizes: the pulse amplitude is
+    $A_{\rm wave}\asymp q^{-1/2-h/2}$, smaller than the background speed $q^{-1/2-h}$ by
+    $q^{h/2}$, but its square divided by the wavelength $q^{1/2+h/2}$ is $q^{-3/2-h}$, exactly the
+    scale of the background residual. The pulses are a lower-order velocity and a leading-order
+    stress.
+  </p>
+
+  <h2>Two families and a cone</h2>
+  <p>
+    The stress has two components and one wave gives one flux direction. So each patch of the
+    annulus carries two families of pulses with different phase gradients, with covariance
+    directions $v_1, v_2\in\mathbb{R}^2$ that depend on the local background. Squared amplitudes
+    are nonnegative, so the stresses two families can produce are the cone
+    $\{c_1 v_1 + c_2 v_2: c_1,c_2\ge 0\}$. The profiles $E$, $U$ of the core are built so that
+    $T$ lies strictly inside this cone wherever it is nonzero. That is the admissible stress cone
+    condition, and it is a constraint on the core imposed by the annulus.
+  </p>
+  <div class="diagram">
+    <svg viewBox="0 0 520 250" role="img" aria-label="Two covariance vectors v1 and v2 span a cone; the target stress T lies inside it and decomposes with positive coefficients.">
+      <defs><marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1f1d3d"/></marker></defs>
+      <polygon points="120,210 470,60 470,210" fill="#ecebfb"/>
+      <line x1="120" y1="210" x2="470" y2="60" stroke="#c4c4c4" stroke-width="1"/>
+      <line x1="120" y1="210" x2="470" y2="210" stroke="#c4c4c4" stroke-width="1"/>
+      <line x1="120" y1="210" x2="330" y2="120" stroke="#1f1d3d" stroke-width="2" marker-end="url(#arr2)"/>
+      <text x="338" y="112" font-size="13" fill="#1f1d3d">v&#8321;</text>
+      <line x1="120" y1="210" x2="330" y2="210" stroke="#1f1d3d" stroke-width="2" marker-end="url(#arr2)"/>
+      <text x="338" y="226" font-size="13" fill="#1f1d3d">v&#8322;</text>
+      <line x1="120" y1="210" x2="380" y2="150" stroke="#4a3aff" stroke-width="2.4" marker-end="url(#arr2)"/>
+      <text x="388" y="146" font-size="13" fill="#4a3aff" font-weight="600">T = c&#8321;v&#8321; + c&#8322;v&#8322;</text>
+      <line x1="120" y1="210" x2="260" y2="150" stroke="#4a3aff" stroke-width="1.2" stroke-dasharray="4 3"/>
+      <line x1="260" y1="150" x2="380" y2="150" stroke="#4a3aff" stroke-width="1.2" stroke-dasharray="4 3"/>
+      <text x="120" y="240" font-size="11.5" fill="#5a5a5a">c&#8321;, c&#8322; &gt; 0: both families switched on, neither asked for a negative square</text>
+      <text x="70" y="214" font-size="12" fill="#9a9a9a">0</text>
+    </svg>
+    <p class="caption">The admissible stress cone. The coefficients stay positive under small perturbations of $v_1$, $v_2$, which is what lets later corrections of either sign be realized by linearizing at the fixed amplitudes.</p>
+  </div>
+
+  <h2>Growth, then decay</h2>
+  <p>
+    A pulse is a wave $a\cos(\xi\cdot x+\varphi)$ with $a\cdot\xi = 0$, oscillating across its own
+    wavevector. In the moving frame of the background it obeys a two-dimensional amplitude
+    equation along the pulse coordinate $v$,
+  </p>
+  <div class="equation-card">
+    $$z' = \big(\mathrm{diag}(\lambda(v),-\lambda(v)) + E\big)z - d(v)\,z,$$
+    $$\lambda(v) = \frac{\lambda_0}{\sqrt{1+s(v)^2}},\qquad d_{\rm ref}(v) = \varepsilon k^2 B_s^2\,(1+s(v)^2),$$
+  </div>
+  <p>
+    with $|E|$ small. The growing coordinate extracts energy from the shear at rate $\lambda$; the
+    damping $d$ is viscosity acting on the squared wavenumber. The shear tilts the wavevector as
+    the pulse rides along, which is the linear growth of $s(v)$: tilting weakens the extraction
+    and lengthens the wavevector, so the damping overtakes. The net rate
+    $\lambda - d_{\rm ref}$ is positive at first and negative later, and vanishes at the
+    midpoint by construction. The envelope
+  </p>
+  <div class="equation-card">
+    $$P(v) = \exp\!\int_{L_s/2}^{v}\big(\lambda(w)-d_{\rm ref}(w)\big)\,dw,\qquad
+      e^{-C(v-L_s/2)^2/L_s}\le P(v)\le e^{-c(v-L_s/2)^2/L_s},$$
+  </div>
+  <p>
+    is Gaussian in $v$: exponentially small at both ends of the pulse interval. That is what
+    makes each pulse cut off cleanly, and it is the sense in which each pulse is seeded by an
+    exponentially small force. The energy budget of the pulse is exact:
+  </p>
+  <div class="equation-card">
+    $$\frac12\frac{d}{dv}|t|^2 = -\,g\cdot\big(t_r(t_\theta,t_z)\big) - \varepsilon k^2|n_\Phi|^2\,|t|^2 .$$
+  </div>
+  <p>
+    In English: the pulse gains energy from the background shear $g$ through the very momentum
+    flux $t_r(t_\theta,t_z)$ that it is there to deliver, and loses it to viscosity. The
+    mechanism that supplies the stress is the mechanism that feeds the pulse. This is Orr's
+    mechanism from shear-flow stability, and the exact waves of Craik and Criminale are the
+    inviscid ancestors.
+  </p>
+
+  <div class="widget">
+    <div class="controls">
+      <label for="ustar">tilt u*</label>
+      <input type="range" id="ustar" min="0.3" max="3" step="0.05" value="1.0" />
+      <span class="val" id="ustarVal">1.00</span>
+      <label for="Ls">pulse length L<sub>s</sub></label>
+      <input type="range" id="Ls" min="4" max="60" step="1" value="20" />
+      <span class="val" id="LsVal">20</span>
+    </div>
+    <canvas id="pulse" width="820" height="280"></canvas>
+    <div class="readout" id="pulseRead"></div>
+  </div>
+  <div class="lookfor">
+    What to look for: the growth rate falls monotonically and the damping rises monotonically
+    along the pulse, they cross once, at the midpoint, and the envelope peaks there. Lengthening
+    the pulse deepens the Gaussian tails at both ends, which is the seed becoming smaller. If any
+    parameter produced two crossings or a peak away from the midpoint, the envelope bound above
+    would be false; it cannot, because $\lambda_0$ and $B_s$ are tied by the midpoint condition.
+  </div>
+
+  <h2>Keeping the pulses apart</h2>
+  <p>
+    Pulses on successively finer scales must not interact except where the construction wants
+    them to. The paper gives each pulse an auxiliary variable $Y$ on a torus $\mathbb{T}^2$,
+    computes covariances on that torus, and only afterwards evaluates $Y$ at a fixed phase map
+    $Y(r,t)$. Pulses whose supports overlap in physical space are given disjoint supports in
+    $Y$, so their products vanish identically. Harmonics of the same pulse keep their
+    interactions, and those are what the correction cycle handles. Exact incompressibility comes
+    from taking curls of supported vector potentials, and the extra terms that the curl produces
+    are carried, not dropped.
+  </p>
+
+  <p class="pagenav">Next: <a href="./corrections.html">corrections and completion</a>.</p>
+
+  <script>
+  (function(){
+    var cv=document.getElementById('pulse'), ctx=cv.getContext('2d');
+    var uS=document.getElementById('ustar'), uV=document.getElementById('ustarVal'), LS=document.getElementById('Ls'), LV=document.getElementById('LsVal'), ro=document.getElementById('pulseRead');
+    function draw(){
+      var u=parseFloat(uS.value), Ls=parseFloat(LS.value); uV.textContent=u.toFixed(2); LV.textContent=Ls;
+      var lam0=1.0, D=Math.pow(1+u*u,1.5);
+      function s(v){return u*(0.5+v/Ls);}
+      function lam(v){return lam0/Math.sqrt(1+s(v)*s(v));}
+      function dref(v){return lam0*(1+s(v)*s(v))/D;}
+      var N=400, vs=[], P=[], G=[], Dd=[];
+      // integrate log P from midpoint outward
+      var logP=new Array(N+1); var mid=N/2; logP[mid]=0;
+      for(var i=mid;i<N;i++){var v=Ls*i/N,dv=Ls/N; logP[i+1]=logP[i]+(lam(v)-dref(v))*dv;}
+      for(var j=mid;j>0;j--){var v2=Ls*j/N,dv2=Ls/N; logP[j-1]=logP[j]-(lam(v2)-dref(v2))*dv2;}
+      for(var k=0;k<=N;k++){var vk=Ls*k/N; vs.push(vk); P.push(Math.exp(logP[k])); G.push(lam(vk)); Dd.push(dref(vk));}
+      var W=cv.width,H=cv.height,L=56,R=24,T=18,B=40, mid_h=H/2;
+      ctx.clearRect(0,0,W,H); ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+      function X(v){return L+v/Ls*(W-L-R);}
+      // top panel: envelope; bottom: rates
+      var topT=T, topB=mid_h-10, botT=mid_h+10, botB=H-B;
+      function Ytop(p){return topT+(1-p)*(topB-topT);}
+      var rmax=Math.max.apply(null,G.concat(Dd))*1.05;
+      function Ybot(r){return botT+(1-r/rmax)*(botB-botT);}
+      ctx.strokeStyle='#eee'; ctx.lineWidth=1; ctx.font='11px system-ui'; ctx.fillStyle='#9a9a9a'; ctx.textAlign='right';
+      [0,0.5,1].forEach(function(g){ctx.beginPath();ctx.moveTo(L,Ytop(g));ctx.lineTo(W-R,Ytop(g));ctx.stroke();ctx.fillText(g.toFixed(1),L-6,Ytop(g)+4);});
+      [0,rmax/2,rmax].forEach(function(g){ctx.beginPath();ctx.moveTo(L,Ybot(g));ctx.lineTo(W-R,Ybot(g));ctx.stroke();ctx.fillText(g.toFixed(2),L-6,Ybot(g)+4);});
+      ctx.textAlign='center';
+      [0,0.25,0.5,0.75,1].forEach(function(f){var x=X(f*Ls);ctx.beginPath();ctx.moveTo(x,T);ctx.lineTo(x,botB);ctx.stroke();ctx.fillText('v = '+(f*Ls).toFixed(0),x,botB+16);});
+      ctx.fillStyle='#5a5a5a'; ctx.fillText('pulse coordinate v along the slot (λ₀ = 1)',W/2,H-6);
+      function line(arr,Y,color){ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();arr.forEach(function(y,i){var x=X(vs[i]);if(i===0)ctx.moveTo(x,Y(y));else ctx.lineTo(x,Y(y));});ctx.stroke();}
+      line(P,Ytop,'#4a3aff'); line(G,Ybot,'#2a78d6'); line(Dd,Ybot,'#eb6834');
+      ctx.textAlign='left'; ctx.font='12px system-ui';
+      ctx.fillStyle='#4a3aff'; ctx.fillText('envelope P(v)',L+6,topT+12);
+      ctx.fillStyle='#2a78d6'; ctx.fillText('growth rate λ(v)',L+6,Ybot(G[0])-6);
+      ctx.fillStyle='#eb6834'; ctx.fillText('damping d_ref(v)',L+6,Ybot(Dd[0])+14);
+      ro.innerHTML='Seed at v = 0 is P(0) = '+P[0].toExponential(2)+' of the peak; at v = L<sub>s</sub> it is '+P[N].toExponential(2)+'. Net rate crosses zero at v = '+(Ls/2).toFixed(1)+'.';
+    }
+    uS.addEventListener('input',draw); LS.addEventListener('input',draw); draw();
+  })();
+  </script>
+</main>
+
+  <footer>
+    <a href="https://github.com/microprediction/navier">Source</a> &middot;
+    Maintained by <a href="https://github.com/microprediction">Peter Cotton</a>.
+  </footer>
+</body>
+</html>

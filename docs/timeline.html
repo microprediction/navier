@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Timeline</title>
+  <meta name="description" content="Dated events from Leray to September 2026." />
+  <link rel="stylesheet" href="./style.css" />
+  <style>
+    header.site-header nav strong.cur { color:#fff; font-weight:600; display:block; padding:7px 14px; white-space:nowrap; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand" href="./index.html">navier</a>
+    <nav>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-guide">Guide</span><span class="drop" id="menu-guide">
+        <a href="./equations.html">The problem</a>
+        <a href="./residual.html">The residual trick</a>
+        <a href="./scaling.html">Scales and exponents</a>
+        <a href="./core.html">The core</a>
+        <a href="./pulses.html">The annulus and the pulses</a>
+        <a href="./corrections.html">Corrections and completion</a>
+        <a href="./status.html">What is settled</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-fluctuations">Fluctuations</span><span class="drop" id="menu-fluctuations">
+        <a href="./fluctuating.html">Can fluctuations break it?</a>
+        <a href="./scales.html">The molecular limit</a>
+        <a href="./seeds.html">Seeds and noise</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-literature">Literature</span><span class="drop" id="menu-literature">
+        <a href="./papers.html">Papers</a>
+        <a href="./bibliography.html">Bibliography</a>
+        <a href="./map.html">Map</a>
+        <strong class="cur">Timeline</strong>
+      </span></span>
+      <a href="https://github.com/microprediction/navier">GitHub</a>
+    </nav>
+  </div>
+  <script>
+    (function () {
+      var hdr = document.querySelector('.site-header'), menus = [].slice.call(hdr.querySelectorAll('.menu'));
+      hdr.classList.add('js-menus');
+      function label(m) { return m.querySelector('.menu-label'); }
+      function links(m) { return [].slice.call(m.querySelectorAll('.drop a')); }
+      function isOpen(m) { return m.classList.contains('open'); }
+      function set(m, open, pin) {
+        m.classList.toggle('open', open); m.pinned = open && !!pin;
+        label(m).setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) menus.forEach(function (o) { if (o !== m && isOpen(o)) set(o, false); });
+      }
+      menus.forEach(function (m) {
+        var b = label(m);
+        b.addEventListener('click', function (e) { e.stopPropagation(); set(m, !(isOpen(m) && m.pinned), true); });
+        b.addEventListener('keydown', function (e) {
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowDown') return;
+          e.preventDefault();
+          if (e.key !== 'ArrowDown' && isOpen(m) && m.pinned) { set(m, false); return; }
+          set(m, true, true); links(m)[0].focus();
+        });
+        m.querySelector('.drop').addEventListener('keydown', function (e) {
+          var a = links(m), i = a.indexOf(document.activeElement), n = a.length;
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); a[(i + (e.key === 'ArrowDown' ? 1 : n - 1)) % n].focus(); }
+          else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); a[e.key === 'Home' ? 0 : n - 1].focus(); }
+        });
+        m.addEventListener('mouseenter', function () { if (!isOpen(m)) set(m, true, false); });
+        m.addEventListener('mouseleave', function () { if (isOpen(m) && !m.pinned) set(m, false); });
+        m.addEventListener('focusout', function (e) { if (isOpen(m) && !m.contains(e.relatedTarget)) set(m, false); });
+      });
+      document.addEventListener('click', function (e) { menus.forEach(function (m) { if (isOpen(m) && !m.contains(e.target)) set(m, false); }); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        menus.forEach(function (m) { if (!isOpen(m)) return; var inside = m.contains(document.activeElement); set(m, false); if (inside) label(m).focus(); });
+      });
+    })();
+  </script>
+</header>
+
+<main>
+  <h1>Timeline</h1>
+  <p class="subtitle">From weak solutions to a machine-checked forced singularity, with September 2026 by the day.</p>
+  <style>
+    .tl { list-style: none; padding: 0; margin: 20px 0; border-left: 2px solid var(--border); }
+    .tl li { position: relative; padding: 0 0 14px 22px; margin: 0; }
+    .tl li::before { content: ""; position: absolute; left: -7px; top: 8px; width: 10px; height: 10px; border-radius: 50%; background: var(--faint); }
+    .tl li.key::before { background: var(--accent); }
+    .tl .d { font-weight: 600; color: var(--ink); }
+    .tl .w { color: var(--muted); font-size: .95rem; }
+  </style>
+
+  <h2>The century</h2>
+  <ul class="tl">
+    <li><span class="d">1934</span> Leray constructs global finite-energy weak solutions satisfying an energy inequality. <span class="w">Smoothness left open.</span></li>
+    <li><span class="d">1982</span> Caffarelli, Kohn and Nirenberg: the singular set of a suitable weak solution has zero one-dimensional parabolic Hausdorff measure.</li>
+    <li><span class="d">1984</span> Beale, Kato and Majda: an Euler solution can blow up only if the time integral of the maximum vorticity diverges.</li>
+    <li><span class="d">1996</span> Ne&ccaron;as, R&#367;&#382;i&ccaron;ka and &Scaron;ver&aacute;k: no nontrivial self-similar blow-up in $L^3$.</li>
+    <li class="key"><span class="d">2000</span> Fefferman writes the Clay problem statement with alternatives (A) to (D). <span class="w">The breakdown alternatives allow a smooth decaying force.</span></li>
+    <li><span class="d">2003</span> Escauriaza, Seregin and &Scaron;ver&aacute;k: bounded $L^3$ norm prevents blow-up of the unforced equations.</li>
+    <li><span class="d">2016</span> Tao: finite-time blow-up for an averaged Navier&ndash;Stokes equation that keeps the energy identity. <span class="w">The nonlinearity is modified, not forced.</span></li>
+    <li><span class="d">2019</span> Buckmaster and Vicol: nonuniqueness of weak solutions by convex integration.</li>
+    <li><span class="d">2021</span> Flandoli and Luo: high-mode transport noise controls vorticity blow-up with high probability.</li>
+    <li><span class="d">2022</span> Albritton, Bru&eacute; and Colombo: two distinct Leray&ndash;Hopf solutions from rest with the same force, via an unstable vortex in similarity variables.</li>
+    <li class="key"><span class="d">15 Sep 2023</span> C&oacute;rdoba and Mart&iacute;nez-Zoroa: finite-time singularity for forced 3D Euler with a $C^{1,1/2-\epsilon}$ force.</li>
+    <li><span class="d">9 Jul 2024</span> C&oacute;rdoba, Mart&iacute;nez-Zoroa and Zheng: the same for hypodissipative Navier&ndash;Stokes.</li>
+    <li><span class="d">17 Sep 2025</span> A 22-author preprint including Buckmaster gives numerical constructions of singularities for porous medium and Boussinesq.</li>
+    <li><span class="d">20 May 2026</span> Braunstein: thermal noise and a molecular cutoff make the equations trivially globally well posed.</li>
+  </ul>
+
+  <h2>2026</h2>
+  <ul class="tl">
+    <li class="key"><span class="d">15 Aug</span> Alp&ouml;ge and Buckmaster obtain smooth-forcing blow-up for 3D Euler; Lean verification completes a week later.</li>
+    <li><span class="d">28 Aug</span> OpenAI begins training the model later used.</li>
+    <li><span class="d">1 Sep</span> OpenAI's 88-hour multi-agent run begins, about 10,000 agents.</li>
+    <li><span class="d">6 Sep</span> Meeting between Buckmaster and OpenAI's Bubeck; accounts of it later diverge.</li>
+    <li class="key"><span class="d">7 Sep</span> Tao's blog post on the smooth-forcing blow-ups. Alp&ouml;ge and Buckmaster release three preprints with Lean proofs. Buckmaster posts his statement that night.</li>
+    <li class="key"><span class="d">8 Sep</span> OpenAI releases the 166-page manuscript and the Lean formalization at noon.</li>
+    <li><span class="d">9 Sep</span> Cao, Chi and Nie post the density-of-forces paper. Agresti posts v4 of the transport-noise paper. Alp&ouml;ge posts on authorship.</li>
+    <li><span class="d">8&ndash;13 Sep</span> OpenAI issues successive statements on whether product data could have influenced the result, ending with a categorical denial for inputs after 3 July.</li>
+    <li class="key"><span class="d">11 Sep</span> The Clay Mathematics Institute says the problem has apparently been settled and that its evaluation will be deliberately unhurried. Twenty-six Fields Medalists publish an open letter on AI in mathematics.</li>
+    <li><span class="d">15 Sep</span> Alp&ouml;ge, Buckmaster and Coiculescu post the porous medium paper to arXiv. Duraiswami posts the porous-walls comparison.</li>
+    <li class="key"><span class="d">17 Sep</span> Constantin, Ignatova and Vicol: analytic forcing implies regularity for flows of the construction's type.</li>
+    <li><span class="d">23 Sep</span> The homogenization site opens an issue on how averaged Navier&ndash;Stokes and the forced blow-up differ from fast switching; this site is the answer.</li>
+  </ul>
+  <p class="muted">Dates for the September events follow the arXiv timestamps and the Wikipedia article on the priority controversy as of 24 September 2026. Corrections welcome.</p>
+</main>
+
+  <footer>
+    <a href="https://github.com/microprediction/navier">Source</a> &middot;
+    Maintained by <a href="https://github.com/microprediction">Peter Cotton</a>.
+  </footer>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>The molecular limit</title>
+  <meta name="description" content="When the collapsing core reaches the mean free path: time remaining, speed, Mach number and thermal fluctuation level for air and water." />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="./demos.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" crossorigin="anonymous">
+  <style>.katex { white-space: nowrap; } .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }</style>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+    onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+  <style>
+    header.site-header nav strong.cur { color:#fff; font-weight:600; display:block; padding:7px 14px; white-space:nowrap; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand" href="./index.html">navier</a>
+    <nav>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-guide">Guide</span><span class="drop" id="menu-guide">
+        <a href="./equations.html">The problem</a>
+        <a href="./residual.html">The residual trick</a>
+        <a href="./scaling.html">Scales and exponents</a>
+        <a href="./core.html">The core</a>
+        <a href="./pulses.html">The annulus and the pulses</a>
+        <a href="./corrections.html">Corrections and completion</a>
+        <a href="./status.html">What is settled</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-fluctuations">Fluctuations</span><span class="drop" id="menu-fluctuations">
+        <a href="./fluctuating.html">Can fluctuations break it?</a>
+        <strong class="cur">The molecular limit</strong>
+        <a href="./seeds.html">Seeds and noise</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-literature">Literature</span><span class="drop" id="menu-literature">
+        <a href="./papers.html">Papers</a>
+        <a href="./bibliography.html">Bibliography</a>
+        <a href="./map.html">Map</a>
+        <a href="./timeline.html">Timeline</a>
+      </span></span>
+      <a href="https://github.com/microprediction/navier">GitHub</a>
+    </nav>
+  </div>
+  <script>
+    (function () {
+      var hdr = document.querySelector('.site-header'), menus = [].slice.call(hdr.querySelectorAll('.menu'));
+      hdr.classList.add('js-menus');
+      function label(m) { return m.querySelector('.menu-label'); }
+      function links(m) { return [].slice.call(m.querySelectorAll('.drop a')); }
+      function isOpen(m) { return m.classList.contains('open'); }
+      function set(m, open, pin) {
+        m.classList.toggle('open', open); m.pinned = open && !!pin;
+        label(m).setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) menus.forEach(function (o) { if (o !== m && isOpen(o)) set(o, false); });
+      }
+      menus.forEach(function (m) {
+        var b = label(m);
+        b.addEventListener('click', function (e) { e.stopPropagation(); set(m, !(isOpen(m) && m.pinned), true); });
+        b.addEventListener('keydown', function (e) {
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowDown') return;
+          e.preventDefault();
+          if (e.key !== 'ArrowDown' && isOpen(m) && m.pinned) { set(m, false); return; }
+          set(m, true, true); links(m)[0].focus();
+        });
+        m.querySelector('.drop').addEventListener('keydown', function (e) {
+          var a = links(m), i = a.indexOf(document.activeElement), n = a.length;
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); a[(i + (e.key === 'ArrowDown' ? 1 : n - 1)) % n].focus(); }
+          else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); a[e.key === 'Home' ? 0 : n - 1].focus(); }
+        });
+        m.addEventListener('mouseenter', function () { if (!isOpen(m)) set(m, true, false); });
+        m.addEventListener('mouseleave', function () { if (isOpen(m) && !m.pinned) set(m, false); });
+        m.addEventListener('focusout', function (e) { if (isOpen(m) && !m.contains(e.relatedTarget)) set(m, false); });
+      });
+      document.addEventListener('click', function (e) { menus.forEach(function (m) { if (isOpen(m) && !m.contains(e.target)) set(m, false); }); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        menus.forEach(function (m) { if (!isOpen(m)) return; var inside = m.contains(document.activeElement); set(m, false); if (inside) label(m).focus(); });
+      });
+    })();
+  </script>
+</header>
+
+<main>
+  <h1>The molecular limit</h1>
+  <p class="subtitle">Where a real fluid stops following the equations, in metres, seconds and metres per second.</p>
+
+  <p class="lead">
+    The viscosity rescaling of the <a href="./scaling.html">scales page</a> makes the core radius
+    $\ell_r = \sqrt{\nu\tau}$ and the core speed $U = \sqrt{\nu/\tau}$, each up to a fixed
+    factor that the theorem never states. Set those factors to one. Then the product
+    $U\ell_r=\nu$ for every fluid, and three questions have numerical answers.
+  </p>
+
+  <h2>Three coincidences that are one</h2>
+  <p>
+    The continuum description fails when the core radius reaches the mean free path,
+    $\ell_r=\ell_{\rm mfp}$. That happens at
+  </p>
+  <div class="equation-card">
+    $$\tau^* = \frac{\ell_{\rm mfp}^2}{\nu},\qquad U^* = \frac{\nu}{\ell_{\rm mfp}},\qquad
+      \mathrm{Ma}^* = \frac{\nu}{\ell_{\rm mfp}\,c},\qquad
+      \frac{v_T}{U}\Big|_{\ell_{\rm mfp}} = \frac{1}{\nu}\sqrt{\frac{k_BT}{\rho\,\ell_{\rm mfp}}} .$$
+  </div>
+  <p>
+    Kinetic theory gives $\nu\approx\tfrac12\ell_{\rm mfp}\bar v$ with $\bar v$ the mean molecular
+    speed, and the sound speed is of the same order as $\bar v$. So $U^*\approx\bar v/2$ and the
+    Mach number at the moment the continuum fails is of order one. In English: the core hits the
+    molecular scale, the molecular speed, and the sound barrier at the same instant, because all
+    three are the same statement about what viscosity is. Incompressibility fails with the
+    continuum. The isothermal assumption fails too, since a Mach-one flow heats.
+  </p>
+
+  <div class="widget">
+    <div class="controls">
+      <label for="fluid">fluid</label>
+      <button id="air" class="on">air</button>
+      <button id="water">water</button>
+      <label for="lr">core radius &#8467;<sub>r</sub></label>
+      <input type="range" id="lr" min="-9" max="-2" step="0.05" value="-6" />
+      <span class="val" id="lrVal">1 &micro;m</span>
+    </div>
+    <canvas id="sc" width="820" height="300"></canvas>
+    <div class="readout" id="scRead"></div>
+  </div>
+  <div class="lookfor">
+    What to look for: the core speed and the thermal velocity at the core scale both rise as the
+    radius falls, but the thermal one rises faster, so the gap between them closes toward the
+    mean free path. The dashed line is the mean free path for air or the molecular scale for
+    water; to its left the chart describes nothing. If the two solid lines crossed to the right of
+    the dashed line, thermal fluctuations would exceed the flow inside the continuum regime and
+    the deterministic core would be meaningless there; they do not, for either fluid, with unit
+    prefactors.
+  </div>
+
+  <h2>The numbers</h2>
+  <div class="table-wrap"><table class="impl">
+    <thead><tr><th>Fluid</th><th>$\nu$ (m$^2$/s)</th><th>molecular scale</th><th>$\tau^*$</th><th>$U^*$</th><th>Ma$^*$</th><th>$v_T/U$ there</th></tr></thead>
+    <tbody>
+      <tr><td>air, 20&deg;C</td><td>$1.5\times10^{-5}$</td><td>68 nm (mean free path)</td><td>0.31 ns</td><td>220 m/s</td><td>0.64</td><td>1.5%</td></tr>
+      <tr><td>water, 20&deg;C</td><td>$1.0\times10^{-6}$</td><td>1 nm (a few molecules)</td><td>1 ps</td><td>1000 m/s</td><td>0.68</td><td>6%</td></tr>
+    </tbody>
+  </table></div>
+  <p>
+    Karniadakis's figure of 70 nanometres for air is the mean free path. The table says what
+    that entails: the equations stop describing air a third of a nanosecond before the singular
+    time, when the core is moving at two-thirds the speed of sound and the thermal velocity at
+    the core scale is over one percent of the flow. Water has no mean free path in the gas
+    sense; a nanometre is where the continuum is conventionally taken to end, and the picture
+    is the same.
+  </p>
+
+  <h2>Scope</h2>
+  <p>
+    The prefactors are unknown. The core speed is $e_0\tau^{-A}$ with $e_0>0$ a constant of the
+    profile construction that the paper does not evaluate, and the relevant core radius is
+    $\sqrt{2X_{\rm in}\tau}$ with $X_{\rm in}$ a chosen similarity radius. A large $e_0$ makes the
+    speed hit the sound barrier earlier in $\tau$, at a larger core radius; a small $X_{\rm in}$
+    makes the radius hit the mean free path earlier. Both move the continuum failure away from
+    the singular time, never toward it. The exponent $h$ changes the powers by less than one
+    part in a hundred and does not affect the conclusion. The thermal ratio uses the
+    Landau&ndash;Lifshitz estimate of velocity variance in a volume $\ell^3$ and is a scaling
+    argument, not a computation of the noise projected onto the pulse modes; the
+    <a href="./seeds.html">seeds page</a> takes that step heuristically.
+  </p>
+
+  <p class="pagenav">Next: <a href="./seeds.html">seeds and noise</a>.</p>
+
+  <script>
+  (function(){
+    var fluids={air:{nu:1.5e-5,mfp:6.8e-8,c:343,rho:1.2,name:'air'},water:{nu:1.0e-6,mfp:1.0e-9,c:1480,rho:1000,name:'water'}};
+    var kT=4.05e-21, cur='air';
+    var cv=document.getElementById('sc'),ctx=cv.getContext('2d'),lr=document.getElementById('lr'),lrV=document.getElementById('lrVal'),ro=document.getElementById('scRead');
+    function p2(x){return Number(x.toPrecision(2)).toString();}
+    function fmtLen(m){if(m>=1e-3)return p2(m*1e3)+' mm';if(m>=1e-6)return p2(m*1e6)+' µm';return p2(m*1e9)+' nm';}
+    function fmtT(s){if(s>=1)return s.toPrecision(2)+' s';if(s>=1e-3)return (s*1e3).toPrecision(2)+' ms';if(s>=1e-6)return (s*1e6).toPrecision(2)+' µs';if(s>=1e-9)return (s*1e9).toPrecision(2)+' ns';return (s*1e12).toPrecision(2)+' ps';}
+    function draw(){
+      var F=fluids[cur], l=Math.pow(10,parseFloat(lr.value)); lrV.innerHTML=fmtLen(l);
+      var W=cv.width,H=cv.height,L=64,R=24,T=18,B=40;
+      ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+      var xmin=-9,xmax=-2,ymin=-4,ymax=4;
+      function X(lg){return L+(lg-xmin)/(xmax-xmin)*(W-L-R);} function Y(lg){return T+(ymax-lg)/(ymax-ymin)*(H-T-B);}
+      ctx.strokeStyle='#eee';ctx.lineWidth=1;ctx.font='11px system-ui';ctx.fillStyle='#9a9a9a';ctx.textAlign='right';
+      for(var g=ymin;g<=ymax;g+=2){ctx.beginPath();ctx.moveTo(L,Y(g));ctx.lineTo(W-R,Y(g));ctx.stroke();ctx.fillText('10^'+g+' m/s',L-6,Y(g)+4);}
+      ctx.textAlign='center';
+      for(var x=xmin;x<=xmax;x+=1){ctx.beginPath();ctx.moveTo(X(x),T);ctx.lineTo(X(x),H-B);ctx.stroke();ctx.fillText(fmtLen(Math.pow(10,x)),X(x),H-B+16);}
+      ctx.fillStyle='#5a5a5a';ctx.fillText('core radius ℓ_r (log-log, unit prefactors, '+F.name+')',W/2,H-6);
+      function series(fn,color,label,dy){ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();for(var i=0;i<=140;i++){var lg=xmin+(xmax-xmin)*i/140;var v=Math.log10(fn(Math.pow(10,lg)));if(i===0)ctx.moveTo(X(lg),Y(v));else ctx.lineTo(X(lg),Y(v));}ctx.stroke();ctx.fillStyle=color;ctx.textAlign='left';ctx.font='12px system-ui';ctx.fillText(label,X(-5.0)+4,Y(Math.log10(fn(Math.pow(10,-5.0))))+dy);}
+      series(function(l){return F.nu/l;},'#2a78d6','core speed ν/ℓ_r',-8);
+      series(function(l){return Math.sqrt(kT/(F.rho*l*l*l));},'#eb6834','thermal velocity at scale ℓ_r',-6);
+      ctx.strokeStyle='#9a9a9a';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(X(Math.log10(F.mfp)),T);ctx.lineTo(X(Math.log10(F.mfp)),H-B);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(L,Y(Math.log10(F.c)));ctx.lineTo(W-R,Y(Math.log10(F.c)));ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle='#5a5a5a';ctx.textAlign='left';ctx.fillText(cur==='air'?'mean free path':'molecular scale',X(Math.log10(F.mfp))+4,T+12);ctx.fillText('sound speed',W-R-80,Y(Math.log10(F.c))-5);
+      ctx.strokeStyle='#4a3aff';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(X(Math.log10(l)),T);ctx.lineTo(X(Math.log10(l)),H-B);ctx.stroke();
+      var tau=l*l/F.nu,U=F.nu/l,vT=Math.sqrt(kT/(F.rho*l*l*l));
+      ro.innerHTML='At ℓ_r = '+fmtLen(l)+': time remaining <b>'+fmtT(tau)+'</b>, core speed <b>'+U.toPrecision(2)+' m/s</b>, Mach <b>'+(U/F.c).toPrecision(2)+'</b>, Knudsen <b>'+(F.mfp/l).toPrecision(2)+'</b>, thermal/flow <b>'+(100*vT/U).toPrecision(2)+'%</b>.'+(l<F.mfp?' <b>Below the molecular scale: no continuum.</b>':'');
+    }
+    lr.addEventListener('input',draw);
+    document.getElementById('air').addEventListener('click',function(){cur='air';this.classList.add('on');document.getElementById('water').classList.remove('on');draw();});
+    document.getElementById('water').addEventListener('click',function(){cur='water';this.classList.add('on');document.getElementById('air').classList.remove('on');draw();});
+    draw();
+  })();
+  </script>
+</main>
+
+  <footer>
+    <a href="https://github.com/microprediction/navier">Source</a> &middot;
+    Maintained by <a href="https://github.com/microprediction">Peter Cotton</a>.
+  </footer>
+</body>
+</html>
