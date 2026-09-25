@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>The formal statement</title>
+  <meta name="description" content="What the Lean 4 formalization of the Navier–Stokes breakdown actually states, how it maps to Fefferman's conditions, and what a build on this machine established." />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" crossorigin="anonymous">
+  <style>.katex { white-space: nowrap; } .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }</style>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+    onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+  <style>
+    header.site-header nav strong.cur { color:#fff; font-weight:600; display:block; padding:7px 14px; white-space:nowrap; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand" href="./index.html">navier</a>
+    <nav>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-guide">Guide</span><span class="drop" id="menu-guide">
+        <a href="./equations.html">The problem</a>
+        <a href="./residual.html">The residual trick</a>
+        <a href="./scaling.html">Scales and exponents</a>
+        <a href="./core.html">The core</a>
+        <a href="./pulses.html">The annulus and the pulses</a>
+        <a href="./corrections.html">Corrections and completion</a>
+        <strong class="cur">The formal statement</strong>
+        <a href="./status.html">What is settled</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-fluctuations">Fluctuations</span><span class="drop" id="menu-fluctuations">
+        <a href="./fluctuating.html">Can fluctuations break it?</a>
+        <a href="./scales.html">The molecular limit</a>
+        <a href="./seeds.html">Seeds and noise</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-literature">Literature</span><span class="drop" id="menu-literature">
+        <a href="./papers.html">Papers</a>
+        <a href="./bibliography.html">Bibliography</a>
+        <a href="./map.html">Map</a>
+        <a href="./timeline.html">Timeline</a>
+      </span></span>
+      <a href="https://github.com/microprediction/navier">GitHub</a>
+    </nav>
+  </div>
+  <script>
+    (function () {
+      var hdr = document.querySelector('.site-header'), menus = [].slice.call(hdr.querySelectorAll('.menu'));
+      hdr.classList.add('js-menus');
+      function label(m) { return m.querySelector('.menu-label'); }
+      function links(m) { return [].slice.call(m.querySelectorAll('.drop a')); }
+      function isOpen(m) { return m.classList.contains('open'); }
+      function set(m, open, pin) {
+        m.classList.toggle('open', open); m.pinned = open && !!pin;
+        label(m).setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) menus.forEach(function (o) { if (o !== m && isOpen(o)) set(o, false); });
+      }
+      menus.forEach(function (m) {
+        var b = label(m);
+        b.addEventListener('click', function (e) { e.stopPropagation(); set(m, !(isOpen(m) && m.pinned), true); });
+        b.addEventListener('keydown', function (e) {
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowDown') return;
+          e.preventDefault();
+          if (e.key !== 'ArrowDown' && isOpen(m) && m.pinned) { set(m, false); return; }
+          set(m, true, true); links(m)[0].focus();
+        });
+        m.querySelector('.drop').addEventListener('keydown', function (e) {
+          var a = links(m), i = a.indexOf(document.activeElement), n = a.length;
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); a[(i + (e.key === 'ArrowDown' ? 1 : n - 1)) % n].focus(); }
+          else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); a[e.key === 'Home' ? 0 : n - 1].focus(); }
+        });
+        m.addEventListener('mouseenter', function () { if (!isOpen(m)) set(m, true, false); });
+        m.addEventListener('mouseleave', function () { if (isOpen(m) && !m.pinned) set(m, false); });
+        m.addEventListener('focusout', function (e) { if (isOpen(m) && !m.contains(e.relatedTarget)) set(m, false); });
+      });
+      document.addEventListener('click', function (e) { menus.forEach(function (m) { if (isOpen(m) && !m.contains(e.target)) set(m, false); }); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        menus.forEach(function (m) { if (!isOpen(m)) return; var inside = m.contains(document.activeElement); set(m, false); if (inside) label(m).focus(); });
+      });
+    })();
+  </script>
+</header>
+
+<main>
+  <h1>The formal statement</h1>
+  <p class="subtitle">What the Lean proof proves, clause by clause, and what a build on one laptop established on 24 September 2026.</p>
+
+  <p class="lead">
+    A machine-checked proof settles one question and raises another. It settles whether the
+    stated proposition follows from the axioms. It raises whether the stated proposition is
+    the one the prose claims. This page is the second question, for the two Navier&ndash;Stokes
+    theorems in the repository <code>openai/NavierStokesAndEuler</code>.
+  </p>
+
+  <h2>What was run</h2>
+  <p>
+    The repository was cloned, the pinned toolchain installed (Lean 4.34.0-rc2, a fixed
+    Mathlib commit), the Mathlib cache fetched, and <code>lake build</code> run on all three
+    libraries. The build completed with exit code zero.
+  </p>
+  <div class="table-wrap"><table class="impl">
+    <thead><tr><th>Item</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Navier&ndash;Stokes modules</td><td>816 files, about 430,000 lines</td></tr>
+      <tr><td>Euler modules</td><td>1,839 files</td></tr>
+      <tr><td>Build jobs</td><td>11,424, all succeeded</td></tr>
+      <tr><td>Wall time</td><td>4 h 28 min on 28 cores (5 h for user time; the two slowest Euler modules took 15 min each)</td></tr>
+      <tr><td><code>sorry</code> in either library</td><td>none</td></tr>
+      <tr><td><code>axiom</code> declarations</td><td>none</td></tr>
+      <tr><td>Axioms of (C), (D), the paper's Theorem 1.1, and the periodic corollary</td><td><code>propext</code>, <code>Classical.choice</code>, <code>Quot.sound</code> only</td></tr>
+    </tbody>
+  </table></div>
+  <p>
+    The axiom lists were obtained with <code>#print axioms</code> against the built modules.
+    Those three axioms are the standard foundation of Mathlib; <code>sorryAx</code> did not
+    appear. The repository's Comparator challenge, which checks at kernel level that the
+    solution's definitions are identical to an independent reference, was not run: it
+    requires <code>landrun</code>, a Linux sandbox. The textual diff below is the informal
+    version of that check.
+  </p>
+
+  <h2>Whose statement it is</h2>
+  <p>
+    The formal statement of alternatives (C) and (D) was not written by the authors of the
+    proof. It is a copy of the encoding of the Clay problem in Google DeepMind's Formal
+    Conjectures project, pinned to commit <code>8bf45ed</code>. Diffing the copy against the
+    upstream file shows only three changes: the placeholders for alternatives (A) and (B) are
+    removed, the namespace is renamed, and two category attributes are dropped. The
+    definitions are otherwise identical. The proof then supplies the two theorems that the
+    reference leaves as <code>sorry</code>. This separation is the point: the people who
+    chose the definitions are not the people who proved the theorem.
+  </p>
+
+  <h2>The clauses</h2>
+  <p>
+    The theorem for (C), as Lean prints it, is
+  </p>
+  <pre style="background:#f3f3f7;padding:12px 14px;border-radius:6px;overflow-x:auto;font-size:0.85em;font-family:'SFMono-Regular',Menlo,Consolas,monospace;">navier_stokes_breakdown_R3 : ∀ nu > 0,
+  ∃ u₀ f,
+    InitialVelocityConditionDecay u₀ ∧ ForceConditionDecay f ∧
+      ¬∃ v p, NavierStokesExistenceAndSmoothnessRn nu u₀ f v p</pre>
+  <p>
+    Each named condition is a structure whose fields are Fefferman's numbered conditions.
+  </p>
+  <div class="table-wrap"><table class="impl">
+    <thead><tr><th>Lean field</th><th>Fefferman</th><th>Formal content</th></tr></thead>
+    <tbody>
+      <tr><td>u₀ div_free, smooth</td><td>(2), (3)</td><td>$\nabla\cdot u^\circ=0$ everywhere; $u^\circ\in C^\infty$.</td></tr>
+      <tr><td>u₀ decay</td><td>(4)</td><td>for every order $m$ and every $K$, some $C$ with $\|\partial^m u^\circ(x)\|\le C(1+|x|)^{-K}$.</td></tr>
+      <tr><td>f smooth</td><td>(5)</td><td>$C^\infty$ on $\mathbb{R}^3\times[0,\infty)$, as a function of $(x,t)$ jointly.</td></tr>
+      <tr><td>f decay</td><td>(5)</td><td>every space-time derivative bounded by $C(1+|x|+t)^{-K}$ for $t\ge0$.</td></tr>
+      <tr><td>navier_stokes</td><td>(1)</td><td>$\partial_t v + (v\cdot\nabla)v = \nu\Delta v - \nabla p + f$ for all $x$ and $t\ge0$, with $\partial_t$ the one-sided derivative within $[0,\infty)$ at $t=0$.</td></tr>
+      <tr><td>div_free, initial_condition</td><td>(2), (3)</td><td>$\nabla\cdot v=0$ for $t\ge0$; $v(x,0)=u^\circ(x)$.</td></tr>
+      <tr><td>velocity_smooth, pressure_smooth</td><td>(6)</td><td>$v,p\in C^\infty(\mathbb{R}^3\times[0,\infty))$.</td></tr>
+      <tr><td>integrable, globally_bounded_energy</td><td>(7)</td><td>$\|v(\cdot,t)\|\in L^2$ for each $t\ge0$ and $\exists E\ \forall t\ge0:\ \int|v|^2\,dx &lt; E$.</td></tr>
+    </tbody>
+  </table></div>
+  <p>
+    The negation quantifies over all $v$ and $p$ with these properties. Nothing is assumed
+    about the competitor beyond the list: no decay of $v$ at infinity, no growth condition on
+    $p$, no energy inequality. That is stronger than some readings of the prose and is what the
+    paper's Lemma 10.5 pays for with its Riesz-transform control of the pressure.
+  </p>
+  <p>
+    The periodic theorem replaces the decay conditions by 1-periodicity in each coordinate,
+    requires the force to decay in time only, and requires the pressure as well as the velocity
+    to be periodic, following the erratum to the Clay statement.
+  </p>
+
+  <h2>Two readings that were made</h2>
+  <ul>
+    <li><strong>The time derivative at zero.</strong> Fefferman writes the equation on
+      $t\ge0$. The encoding uses <code>derivWithin</code> relative to $[0,\infty)$, so at
+      $t=0$ the equation is imposed with a one-sided derivative. This is the natural reading and
+      it is a reading.</li>
+    <li><strong>Divergence at non-differentiable points.</strong> The divergence is defined as
+      the trace of the Fr&eacute;chet derivative, which Mathlib sets to zero where the function is
+      not differentiable. For the smooth fields in the theorem this junk value never arises,
+      but it means "divergence-free" alone does not imply differentiability.</li>
+  </ul>
+
+  <h2>From the paper's theorem to the Clay quantifiers</h2>
+  <p>
+    The paper's Theorem 1.1 is encoded separately, in the project's own conventions. Its
+    candidate has zero initial velocity, a force with compact support in $\{t>0\}\times\mathbb{R}^3$,
+    velocity and pressure supported in one compact set $K$ for every $t<1$, a uniform energy
+    bound on $[0,1)$, and speed unbounded in every left neighbourhood of $t=1$: for every
+    $M$ and $\delta$ there are $t\in(1-\delta,1)$ and $x$ with $|u(t,x)|>M$. The theorem, also
+    checked here, is
+  </p>
+  <pre style="background:#f3f3f7;padding:12px 14px;border-radius:6px;overflow-x:auto;font-size:0.85em;font-family:'SFMono-Regular',Menlo,Consolas,monospace;">theorem_1_1 : ∀ ν > 0, ∃ u p f K,
+  CandidateProperties ν u p f K ∧ ¬ Nonempty (GlobalFiniteEnergySolution ν f)</pre>
+  <p>
+    A bridge module derives the Clay form from it: the initial datum is the zero field, which
+    satisfies (4) trivially; a compactly supported smooth force satisfies (5); the argument
+    order is swapped from $(t,x)$ to $(x,t)$; and the viscosity is normalized to one by the
+    rescaling on the <a href="./scaling.html">scales page</a>. The periodic corollary compresses
+    the supports into a quarter cube and sums integer translates, as in Section 10.5 of the
+    paper. The whole chain, from the candidate to the two Clay statements, carries the same
+    three axioms.
+  </p>
+
+  <h2>What this does not establish</h2>
+  <p>
+    A successful build shows the formal proposition is a theorem of Lean's type theory plus
+    three axioms. It does not show that the 166-page prose is correct, only that a proof of
+    the same statement exists in another language; the prose is the human-readable account and
+    could contain errors the formal proof does not share. It does not show the formal
+    definitions match Fefferman's intent beyond the reading above, which any reader can
+    repeat from the table. And it says nothing about alternatives (A) and (B). The reproduction
+    is nonetheless the strongest check available to anyone with a laptop and an afternoon, and
+    it passed.
+  </p>
+
+  <p class="pagenav">Back to <a href="./status.html">what is settled</a>.</p>
+</main>
+
+  <footer>
+    <a href="https://github.com/microprediction/navier">Source</a> &middot;
+    Maintained by <a href="https://github.com/microprediction">Peter Cotton</a>.
+  </footer>
+</body>
+</html>
