@@ -21,7 +21,8 @@ theorem and it does not. In the others the answer is open, and the site says why
 ## Map
 
 - **Guide**: the problem, the residual trick, scales and exponents, the core, the
-  annulus and the pulses, corrections and completion, what is settled.
+  annulus and the pulses, corrections and completion, homogenization run backwards,
+  the formal statement (the Lean build reproduced, axioms checked), what is settled.
 - **Fluctuations**: can fluctuations break it, the molecular limit (calculator),
   seeds and noise (amplification arithmetic).
 - **Literature**: papers, annotated bibliography, interactive map, timeline.
