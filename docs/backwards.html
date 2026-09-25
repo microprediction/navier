@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Homogenization run backwards</title>
+  <meta name="description" content="The forced blow-up construction is a two-scale expansion in the Bensoussan–Lions–Papanicolaou sense, run in the design direction: choose the fast oscillations so that their average is the slow term you need." />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" crossorigin="anonymous">
+  <style>.katex { white-space: nowrap; } .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }</style>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+    onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+  <style>
+    header.site-header nav strong.cur { color:#fff; font-weight:600; display:block; padding:7px 14px; white-space:nowrap; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-inner">
+    <a class="brand" href="./index.html">navier</a>
+    <nav>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-guide">Guide</span><span class="drop" id="menu-guide">
+        <a href="./equations.html">The problem</a>
+        <a href="./residual.html">The residual trick</a>
+        <a href="./scaling.html">Scales and exponents</a>
+        <a href="./core.html">The core</a>
+        <a href="./pulses.html">The annulus and the pulses</a>
+        <a href="./corrections.html">Corrections and completion</a>
+        <strong class="cur">Homogenization run backwards</strong>
+        <a href="./formal.html">The formal statement</a>
+        <a href="./status.html">What is settled</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-fluctuations">Fluctuations</span><span class="drop" id="menu-fluctuations">
+        <a href="./fluctuating.html">Can fluctuations break it?</a>
+        <a href="./scales.html">The molecular limit</a>
+        <a href="./seeds.html">Seeds and noise</a>
+      </span></span>
+      <span class="menu"><span class="menu-label" tabindex="0" role="button" aria-expanded="false" aria-controls="menu-literature">Literature</span><span class="drop" id="menu-literature">
+        <a href="./papers.html">Papers</a>
+        <a href="./bibliography.html">Bibliography</a>
+        <a href="./map.html">Map</a>
+        <a href="./timeline.html">Timeline</a>
+      </span></span>
+      <a href="https://github.com/microprediction/navier">GitHub</a>
+    </nav>
+  </div>
+  <script>
+    (function () {
+      var hdr = document.querySelector('.site-header'), menus = [].slice.call(hdr.querySelectorAll('.menu'));
+      hdr.classList.add('js-menus');
+      function label(m) { return m.querySelector('.menu-label'); }
+      function links(m) { return [].slice.call(m.querySelectorAll('.drop a')); }
+      function isOpen(m) { return m.classList.contains('open'); }
+      function set(m, open, pin) {
+        m.classList.toggle('open', open); m.pinned = open && !!pin;
+        label(m).setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) menus.forEach(function (o) { if (o !== m && isOpen(o)) set(o, false); });
+      }
+      menus.forEach(function (m) {
+        var b = label(m);
+        b.addEventListener('click', function (e) { e.stopPropagation(); set(m, !(isOpen(m) && m.pinned), true); });
+        b.addEventListener('keydown', function (e) {
+          if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowDown') return;
+          e.preventDefault();
+          if (e.key !== 'ArrowDown' && isOpen(m) && m.pinned) { set(m, false); return; }
+          set(m, true, true); links(m)[0].focus();
+        });
+        m.querySelector('.drop').addEventListener('keydown', function (e) {
+          var a = links(m), i = a.indexOf(document.activeElement), n = a.length;
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); a[(i + (e.key === 'ArrowDown' ? 1 : n - 1)) % n].focus(); }
+          else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); a[e.key === 'Home' ? 0 : n - 1].focus(); }
+        });
+        m.addEventListener('mouseenter', function () { if (!isOpen(m)) set(m, true, false); });
+        m.addEventListener('mouseleave', function () { if (isOpen(m) && !m.pinned) set(m, false); });
+        m.addEventListener('focusout', function (e) { if (isOpen(m) && !m.contains(e.relatedTarget)) set(m, false); });
+      });
+      document.addEventListener('click', function (e) { menus.forEach(function (m) { if (isOpen(m) && !m.contains(e.target)) set(m, false); }); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        menus.forEach(function (m) { if (!isOpen(m)) return; var inside = m.contains(document.activeElement); set(m, false); if (inside) label(m).focus(); });
+      });
+    })();
+  </script>
+</header>
+
+<main>
+  <h1>Homogenization run backwards</h1>
+  <p class="subtitle">Averaging takes a fast variable and computes the slow equation it leaves behind. The construction decides the slow term it wants and builds the fast variable.</p>
+
+  <p class="lead">
+    The <a href="https://homogenization.microprediction.org">homogenization</a> pages carry a
+    slow quantity and a fast hidden one, replace the fast one by its average, and compute what
+    the average leaves out. The blow-up construction has the same skeleton, the same averaging
+    operators, the same solvability conditions, and the same recursion to every order. It
+    differs in direction. This page sets the two side by side.
+  </p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 760 230" role="img" aria-label="Two boxes: microstructure on the left, effective slow equation on the right. A solid arrow labelled homogenization runs left to right; a dashed arrow labelled the construction runs right to left; the cone condition sits on the return arrow.">
+      <defs>
+        <marker id="arrf" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1f1d3d"/></marker>
+        <marker id="arrb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4a3aff"/></marker>
+      </defs>
+      <rect x="20" y="50" width="220" height="120" rx="10" fill="#fff" stroke="#e2e2e2" stroke-width="1.5"/>
+      <text x="130" y="80" text-anchor="middle" font-size="14" font-weight="600" fill="#1f1d3d">fast structure</text>
+      <text x="130" y="104" text-anchor="middle" font-size="11.5" fill="#5a5a5a">a switching chain, a periodic cell,</text>
+      <text x="130" y="122" text-anchor="middle" font-size="11.5" fill="#5a5a5a">or a family of pulses on a torus</text>
+      <text x="130" y="150" text-anchor="middle" font-size="12" fill="#9a9a9a">w(x, y), y fast</text>
+      <rect x="520" y="50" width="220" height="120" rx="10" fill="#fff" stroke="#e2e2e2" stroke-width="1.5"/>
+      <text x="630" y="80" text-anchor="middle" font-size="14" font-weight="600" fill="#1f1d3d">slow equation</text>
+      <text x="630" y="104" text-anchor="middle" font-size="11.5" fill="#5a5a5a">an averaged coefficient plus corrector,</text>
+      <text x="630" y="122" text-anchor="middle" font-size="11.5" fill="#5a5a5a">or a mean stress in the annulus</text>
+      <text x="630" y="150" text-anchor="middle" font-size="12" fill="#9a9a9a">&#10216;w &#8855; w&#10217; = T</text>
+      <path d="M 246 90 L 513 90" stroke="#1f1d3d" stroke-width="2" fill="none" marker-end="url(#arrf)"/>
+      <text x="380" y="78" text-anchor="middle" font-size="12" fill="#1f1d3d">homogenization: average, then correct</text>
+      <path d="M 514 135 L 247 135" stroke="#4a3aff" stroke-width="2" stroke-dasharray="6 4" fill="none" marker-end="url(#arrb)"/>
+      <text x="380" y="156" text-anchor="middle" font-size="12" fill="#4a3aff">construction: choose pulses whose average is T</text>
+      <text x="380" y="200" text-anchor="middle" font-size="12" fill="#5a5a5a">the return arrow exists only where T lies inside the cone of attainable mean stresses</text>
+    </svg>
+    <p class="caption">One map, two directions. Forward is analysis: given the microstructure, what is the effective equation? Backward is design: given the effective term you need, which microstructure supplies it?</p>
+  </div>
+
+  <h2>The dictionary</h2>
+  <p>
+    Every object on the homogenization pages has a counterpart in the paper, usually with the
+    same name.
+  </p>
+  <div class="table-wrap"><table class="impl">
+    <thead><tr><th>Homogenization</th><th>The construction</th></tr></thead>
+    <tbody>
+      <tr><td>fast hidden variable $y_t$, an exogenous chain</td><td>the pulse phase: carrier $e^{ikm\Phi}$ and an auxiliary torus $Y\in\mathbb{T}^2$</td></tr>
+      <tr><td>two-scale ansatz $u(x, x/\varepsilon)$ with $y=x/\varepsilon$ treated as independent</td><td>extended field $\tilde w(r,\theta,z,t,Y)$, evaluated at the phase map $Y(r,t)$ only after averaging (Section 3.3, (6.3))</td></tr>
+      <tr><td>the averaging operator $\langle\cdot\rangle$</td><td>angular average composed with Haar average on $Y$, equation (3.8)</td></tr>
+      <tr><td>the averaged equation for the slow quantity</td><td>the angularly averaged mean equations of Section 8</td></tr>
+      <tr><td>the cell problem that determines the corrector</td><td>the amplitude equation (7.5) for each harmonic $m$, with its own pressure $\pi_m$</td></tr>
+      <tr><td>solvability: $Lw=f$ has a solution only if $\langle f\rangle=0$</td><td>the fast auxiliary-time derivative is inverted only on zero-mean functions, (8.19); the mean part is passed to the slow correction; the five radial moment equations (8.25) are its solvability conditions</td></tr>
+      <tr><td>initial layers on the fast time scale</td><td>the Gaussian tails of each pulse envelope, cut off where they are exponentially small</td></tr>
+      <tr><td>the engine: a recursion to every order in $\varepsilon=1/\lambda$</td><td>the correction cycle $\sigma_{j+1}=\sigma_j+\tfrac1{10}$ in $\varepsilon=q^{h}$, plus the background expansion in $q^{2nh}$ of Section 5</td></tr>
+      <tr><td>Green&ndash;Kubo: fluctuations raise the mean by half their variance</td><td>the Reynolds stress $\langle w\otimes w\rangle$ in the mean momentum equation</td></tr>
+      <tr><td>convergence orders, one stopping point</td><td>an infinite sum with shrinking cutoffs, because the residual must be flat, not small at a fixed order</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>The reversal</h2>
+  <p>
+    On the homogenization pages the microstructure is data and the effective coefficient is
+    the output. The forward map is well defined and, at each order, unique. In the construction
+    the effective stress $T$ in the annulus is the target, fixed by the mismatch between core
+    and exterior, and the microstructure is chosen to produce it. A backward map need not
+    exist. The admissible stress cone condition of Section 4.3 is the statement that it does:
+    the mean stresses two pulse families can produce form the cone $\{c_1v_1+c_2v_2: c_i\ge0\}$,
+    and the core profiles are shaped so that $T$ lies strictly inside it. In the language of
+    composites this is a G-closure question, which effective tensors a class of
+    microstructures can reach, answered here by construction rather than characterized.
+  </p>
+  <p>
+    The solvability condition changes sides too. In homogenization it is a constraint one
+    discovers: the corrector equation has a solution only when the source averages to zero,
+    and that requirement is what produces the averaged equation. In the construction it is a
+    design rule: anything with nonzero mean cannot be cancelled by a wave and must be routed to
+    the mean-flow correction, and anything the mean-flow correction cannot absorb, the five
+    radial moments, gets its own five-parameter family of bumps. Section 8 is a solvability
+    argument written as an algorithm.
+  </p>
+
+  <h2>Two differences</h2>
+  <p>
+    The analogy is exact in structure and it breaks in two places, which between them explain
+    the fluctuation pages.
+  </p>
+  <p>
+    <strong>The fast variable is endogenous.</strong> The switching chain does not know about
+    the slow equation; it runs at its own rate $\lambda$. The pulses are created by the
+    background shear and fed by it, and their carrier frequency $k\asymp\varepsilon^{-1/2}$
+    grows as the core collapses. The scale separation the averaging needs is enforced band by
+    band: within a dyadic band the slow variables vary on a scale $S_*^{-3}$ and the carrier on
+    $\varepsilon^{1/2}$. That is why the construction can keep averaging all the way to the
+    singular time and why an exogenous switch of fixed rate cannot follow it. An endogenous fast
+    scale keeps pace with $\tau$; an exogenous one is eventually slow.
+  </p>
+  <p>
+    <strong>The correction is leading order by design.</strong> On the homogenization pages the
+    Green&ndash;Kubo term is $O(1/\lambda)$, a correction to an averaged answer that is already
+    right. In the construction the pulse amplitude is tuned so that
+    $A_{\rm wave}^2/\ell_{\rm wave}$ is exactly the scale of the mean residual, $q^{-3/2-h}$.
+    The Reynolds stress is not a corrector to the mean equation; it is a term of the mean
+    equation. This is the answer to the question that began this site. An averaged
+    Navier&ndash;Stokes in the sense of dropping the fast variable is not the averaged equation
+    of the construction, because it drops the term the construction exists to supply. The
+    $1/\lambda$ corrector of an exogenous chain does not apply to oscillations the flow
+    generates itself without a scaling theorem, and no such theorem is in the paper.
+  </p>
+
+  <h2>Parity, eddy viscosity, and the noise that undoes it</h2>
+  <p>
+    Dubrulle and Frisch showed that a parity-invariant small-scale flow homogenizes to an eddy
+    viscosity: the Reynolds stress reduces to a diffusive term with a computable coefficient.
+    Without parity invariance one gets a large-scale instability at first order instead. The
+    pulses are chosen not to be parity invariant, and their mean stress is a directed flux
+    aimed at a target, not a diffusion. The transport noise of Agresti runs the forward map:
+    its scaling limit is an eddy viscosity with enhanced dissipation, which is the
+    parity-invariant case. That is exactly the term the tuned balance cannot tolerate, and it
+    is why the <a href="./fluctuating.html">fluctuations page</a> records that model as the one
+    in which the singularity does not survive.
+  </p>
+
+  <h2>What this buys a reader</h2>
+  <p>
+    Someone who has worked through the two-state switch on the homogenization pages already
+    knows the shape of Sections 3, 7, 8 and 9 of the paper: extend to a fast variable, average,
+    impose solvability, solve the cell problem, recurse. What is new is the direction and the
+    two differences above. The bookkeeping is heavier because every order matters and the
+    expansion must be summed, but no step is of a kind the reader has not seen. The
+    <a href="./pulses.html">pulses page</a> is the cell problem, the
+    <a href="./corrections.html">corrections page</a> is the engine.
+  </p>
+
+  <p class="pagenav">Next: <a href="./formal.html">the formal statement</a>.</p>
+</main>
+
+  <footer>
+    <a href="https://github.com/microprediction/navier">Source</a> &middot;
+    Maintained by <a href="https://github.com/microprediction">Peter Cotton</a>.
+  </footer>
+</body>
+</html>
