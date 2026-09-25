@@ -91,9 +91,13 @@
 
   <p class="lead">
     The viscosity rescaling of the <a href="./scaling.html">scales page</a> makes the core radius
-    $\ell_r = \sqrt{\nu\tau}$ and the core speed $U = \sqrt{\nu/\tau}$, each up to a fixed
-    factor that the theorem never states. Set those factors to one. Then the product
-    $U\ell_r=\nu$ for every fluid, and three questions have numerical answers.
+    $\ell_r = C_r\sqrt{\nu\tau}$ and the core speed $U = C_u\sqrt{\nu/\tau}\;\tau^{-h}$, with
+    profile constants the theorem never states and $\tau$ in units of a time normalization
+    $T_0$. This page is the $h=0$ benchmark with unit constants: $U = \nu/\ell_r$, so
+    $U\ell_r=\nu$ for every fluid. The true product is $C_rC_u\,\tau^{-h}$ times that, and with
+    $h<1/100$ the factor $\tau^{-h}$ stays below $1.32$ over the twelve decades between one
+    second and the nanosecond where the continuum fails. The three numbers below are therefore
+    benchmarks accurate to the unknown constants, not exact consequences of the construction.
   </p>
 
   <h2>Three coincidences that are one</h2>
@@ -109,7 +113,8 @@
   <p>
     Kinetic theory gives $\nu\approx\tfrac12\ell_{\rm mfp}\bar v$ with $\bar v$ the mean molecular
     speed, and the sound speed is of the same order as $\bar v$. So $U^*\approx\bar v/2$ and the
-    Mach number at the moment the continuum fails is of order one. In English: the core hits the
+    Mach number at the moment the continuum fails is of order one. The $\tau^{-h}$ factor moves
+    this by tens of percent at most and always upward. In English: the core hits the
     molecular scale, the molecular speed, and the sound barrier at the same instant, because all
     three are the same statement about what viscosity is. Incompressibility fails with the
     continuum. The isothermal assumption fails too, since a Mach-one flow heats.

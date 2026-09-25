@@ -187,9 +187,18 @@
   <p>
     Time is untouched, so the singular time stays at one. Lengths scale by $\sqrt\nu$ and speeds
     by $\sqrt\nu$. The energy scales by $\nu^{5/2}$. This matters for the
-    <a href="./scales.html">molecular limit</a>: the core radius in metres is
-    $\sqrt{\nu\tau}$ times a fixed number, and the core speed is $\sqrt{\nu/\tau}$ times a fixed
-    number, so their product is $\nu$ times a fixed number for every fluid.
+    <a href="./scales.html">molecular limit</a>. At fixed similarity coordinates the core radius
+    in metres is $\ell_r = C_r\sqrt{\nu}\,\tau^{1/2}$ and the core speed is
+    $U = C_u\sqrt{\nu}\,\tau^{-1/2-h}$, with $C_r$, $C_u$ profile constants and $\tau$ measured in
+    units of the time normalization $T_0$. Their product is
+  </p>
+  <div class="equation-card">
+    $$\frac{U\,\ell_r}{\nu} = C_rC_u\,\tau^{-h},$$
+  </div>
+  <p>
+    which is the angular Reynolds number of the table, growing slowly rather than constant. The
+    speed $\sqrt{\nu/\tau}$ is the $h=0$ reference; the actual speed exceeds it by
+    $\tau^{-h}$, a factor below $1.32$ over twelve decades of $\tau$ when $h<1/100$.
   </p>
 
   <p class="pagenav">Next: <a href="./core.html">the core</a>.</p>
