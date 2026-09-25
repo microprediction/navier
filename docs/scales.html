@@ -161,13 +161,17 @@
 
   <h2>Scope</h2>
   <p>
-    The prefactors are unknown. The core speed is $e_0\tau^{-A}$ with $e_0>0$ a constant of the
-    profile construction that the paper does not evaluate, and the relevant core radius is
-    $\sqrt{2X_{\rm in}\tau}$ with $X_{\rm in}$ a chosen similarity radius. A large $e_0$ makes the
+    The prefactors are unknown and the exponent $h$ is set to zero. The core speed is
+    $e_0\tau^{-A}$ with $A=\tfrac12+h$ and $e_0>0$ a constant of the profile construction that
+    the paper does not evaluate, and the relevant core radius is $\sqrt{2X_{\rm in}\tau}$ with
+    $X_{\rm in}$ a chosen similarity radius. Restoring $h$ multiplies every speed on this page by
+    $(\tau/T_0)^{-h}$, at most $1.32$ for $h<1/100$ across the range shown, and raises the Mach
+    number and the Knudsen crossing accordingly. A large $e_0$ makes the
     speed hit the sound barrier earlier in $\tau$, at a larger core radius; a small $X_{\rm in}$
     makes the radius hit the mean free path earlier. Both move the continuum failure away from
     the singular time, never toward it. The exponent $h$ changes the powers by less than one
-    part in a hundred and does not affect the conclusion. The thermal ratio uses the
+    part in a hundred and does not affect the conclusion, but it does make $U\ell_r/\nu$ grow
+    like $\tau^{-h}$ rather than stay constant; see the <a href="./scaling.html">scales page</a>. The thermal ratio uses the
     Landau&ndash;Lifshitz estimate of velocity variance in a volume $\ell^3$ and is a scaling
     argument, not a computation of the noise projected onto the pulse modes; the
     <a href="./seeds.html">seeds page</a> takes that step heuristically.
@@ -193,7 +197,7 @@
       for(var g=ymin;g<=ymax;g+=2){ctx.beginPath();ctx.moveTo(L,Y(g));ctx.lineTo(W-R,Y(g));ctx.stroke();ctx.fillText('10^'+g+' m/s',L-6,Y(g)+4);}
       ctx.textAlign='center';
       for(var x=xmin;x<=xmax;x+=1){ctx.beginPath();ctx.moveTo(X(x),T);ctx.lineTo(X(x),H-B);ctx.stroke();ctx.fillText(fmtLen(Math.pow(10,x)),X(x),H-B+16);}
-      ctx.fillStyle='#5a5a5a';ctx.fillText('core radius ℓ_r (log-log, unit prefactors, '+F.name+')',W/2,H-6);
+      ctx.fillStyle='#5a5a5a';ctx.fillText('core radius ℓ_r (log-log, h = 0 benchmark, unit prefactors, '+F.name+')',W/2,H-6);
       function series(fn,color,label,dy){ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();for(var i=0;i<=140;i++){var lg=xmin+(xmax-xmin)*i/140;var v=Math.log10(fn(Math.pow(10,lg)));if(i===0)ctx.moveTo(X(lg),Y(v));else ctx.lineTo(X(lg),Y(v));}ctx.stroke();ctx.fillStyle=color;ctx.textAlign='left';ctx.font='12px system-ui';ctx.fillText(label,X(-5.0)+4,Y(Math.log10(fn(Math.pow(10,-5.0))))+dy);}
       series(function(l){return F.nu/l;},'#2a78d6','core speed ν/ℓ_r',-8);
       series(function(l){return Math.sqrt(kT/(F.rho*l*l*l));},'#eb6834','thermal velocity at scale ℓ_r',-6);
