@@ -137,7 +137,7 @@
       <tr><td>the averaging operator $\langle\cdot\rangle$</td><td>angular average composed with Haar average on $Y$, equation (3.8)</td></tr>
       <tr><td>the averaged equation for the slow quantity</td><td>the angularly averaged mean equations of Section 8</td></tr>
       <tr><td>the cell problem that determines the corrector</td><td>the amplitude equation (7.5) for each harmonic $m$, with its own pressure $\pi_m$</td></tr>
-      <tr><td>solvability: $Lw=f$ has a solution only if $\langle f\rangle=0$</td><td>the fast auxiliary-time derivative is inverted only on zero-mean functions, (8.19); the mean part is passed to the slow correction; the five radial moment equations (8.25) are its solvability conditions</td></tr>
+      <tr><td>solvability, the Fredholm alternative for the fast operator: $Lw=f$ has a solution only if $\langle f\rangle=0$</td><td>the fast auxiliary-time derivative is inverted only on zero-mean functions, (8.19); the mean part is passed to the slow correction; the five radial moment equations (8.25) are the finite-dimensional cokernel of that correction</td></tr>
       <tr><td>initial layers on the fast time scale</td><td>the Gaussian tails of each pulse envelope, cut off where they are exponentially small</td></tr>
       <tr><td>the engine: a recursion to every order in $\varepsilon=1/\lambda$</td><td>the correction cycle $\sigma_{j+1}=\sigma_j+\tfrac1{10}$ in $\varepsilon=q^{h}$, plus the background expansion in $q^{2nh}$ of Section 5</td></tr>
       <tr><td>Green&ndash;Kubo: fluctuations raise the mean by half their variance</td><td>the Reynolds stress $\langle w\otimes w\rangle$ in the mean momentum equation</td></tr>
@@ -165,13 +165,19 @@
     resemblance is in the shape of the question and goes no further; the next section says why.
   </p>
   <p>
-    The solvability condition changes sides too. In homogenization it is a constraint one
-    discovers: the corrector equation has a solution only when the source averages to zero,
-    and that requirement is what produces the averaged equation. In the construction it is a
-    design rule: anything with nonzero mean cannot be cancelled by a wave and must be routed to
-    the mean-flow correction, and anything the mean-flow correction cannot absorb, the five
-    radial moments, gets its own five-parameter family of bumps. Section 8 is a solvability
-    argument written as an algorithm.
+    The solvability condition changes sides too, and here the shared anchor is not an analogy
+    but a theorem both sides use: the Fredholm alternative. The fast operator is a derivative
+    in the phase or auxiliary variable on a torus. Its kernel and cokernel are the constants, so
+    $Lw=f$ is solvable exactly when $f$ has zero mean, and the solution is unique up to a
+    constant. In homogenization this is a constraint one discovers: the corrector equation has
+    a solution only when the source averages to zero, and that requirement is what produces
+    the averaged equation. In the construction it is a design rule: anything with nonzero mean
+    cannot be cancelled by a wave and must be routed to the mean-flow correction. The
+    mean-flow correction has its own finite-dimensional obstruction, the five radial moments,
+    and the paper hits it with a five-parameter family of bumps, which is the Lyapunov&ndash;Schmidt
+    pattern: solve on the range, then adjust finitely many parameters to kill the cokernel.
+    Section 8 is a Fredholm argument written as an algorithm, run once per harmonic and per
+    order and then summed.
   </p>
 
   <h2>Where the analogy breaks</h2>
