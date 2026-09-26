@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Homogenization run backwards</title>
-  <meta name="description" content="The forced blow-up construction is a two-scale expansion in the Bensoussan–Lions–Papanicolaou sense, run in the design direction: choose the fast oscillations so that their average is the slow term you need." />
+  <meta name="description" content="The forced blow-up construction has the shape of a two-scale expansion run in the design direction: choose the fast oscillations so that their average is the slow term you need. A dictionary between the two, and the places where the analogy breaks." />
   <link rel="stylesheet" href="./style.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" crossorigin="anonymous">
   <style>.katex { white-space: nowrap; } .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }</style>
@@ -91,9 +91,12 @@
   <p class="lead">
     The <a href="https://homogenization.microprediction.org">homogenization</a> pages carry a
     slow quantity and a fast hidden one, replace the fast one by its average, and compute what
-    the average leaves out. The blow-up construction has the same skeleton, the same averaging
-    operators, the same solvability conditions, and the same recursion to every order. It
-    differs in direction. This page sets the two side by side.
+    the average leaves out. The blow-up construction shares the skeleton: an averaging
+    operator, solvability conditions, a cell problem, a recursion in a small parameter. It runs
+    in the other direction. This page sets the two side by side, and then lists where they
+    part, because the resemblance is in the bookkeeping and not in the theorems. The paper
+    takes no homogenization limit, proves no averaging theorem, and does not use the word.
+    What follows is a reader's dictionary, not a classification of the proof.
   </p>
 
   <div class="diagram">
@@ -153,11 +156,17 @@
     and the core profiles are shaped so that $T$ lies strictly inside it. In the language of
     composites this is a G-closure question, which effective tensors a class of
     microstructures can reach, answered here by construction rather than characterized. The
-    design step has a name too: Sigmund called the search for a microstructure with a
-    prescribed effective tensor an inverse homogenization problem, and solved it by
-    optimization over a unit cell. The pulse construction is an inverse homogenization solved
-    by hand. Neither term is used in fluids, where the same objects go by Reynolds stress and
-    the h-principle; the bridge between the vocabularies is this page's, not the literature's.
+    design step has a name in composites too: Sigmund called the search for a microstructure
+    with a prescribed effective tensor an inverse homogenization problem, and solved it by
+    optimization over a unit cell. The pulse construction solves a problem of the same logical
+    type, prescribe the average and find the fast structure, but the label should not be
+    pressed further than that; the next section says why. The literature the construction
+    actually descends from is the other one: Nash-style oscillatory blocks that realize a
+    prescribed Reynolds stress, the h-principle of
+    <a href="./bibliography.html#DS2017">Daneri and Sz&eacute;kelyhidi</a> and the convex
+    integration of <a href="./bibliography.html#BV2019">Buckmaster and Vicol</a>, where an
+    auxiliary periodic variable does the same separating job as the torus here. The bridge to
+    the composites vocabulary is this page's, not the paper's and not the literature's.
   </p>
   <p>
     The solvability condition changes sides too. In homogenization it is a constraint one
@@ -169,10 +178,36 @@
     argument written as an algorithm.
   </p>
 
-  <h2>Two differences</h2>
+  <h2>Where the analogy breaks</h2>
   <p>
-    The analogy is exact in structure and it breaks in two places, which between them explain
-    the fluctuation pages.
+    The analogy holds at the level of bookkeeping. It breaks in at least five places. The
+    first three are the reasons not to call the construction a homogenization; the last two
+    are the ones that explain the fluctuation pages.
+  </p>
+  <p>
+    <strong>The target is a source, not a constitutive law.</strong> Inverse homogenization
+    prescribes an effective tensor, a coefficient in the averaged equation. The pulses prescribe
+    a forcing term, the divergence of a Reynolds stress, pointwise in the slow variables. The
+    constitutive structure of the mean equation is untouched. Nothing is being replaced by an
+    effective medium; a missing term is being supplied.
+  </p>
+  <p>
+    <strong>There is no homogenization limit.</strong> Homogenization sends a scale ratio to
+    zero and proves that the averaged equation is what remains. The paper takes no limit and
+    proves no averaging theorem. It writes a multiple-scale ansatz and bounds every error term
+    directly, at each order, then sums. The separation it relies on is asymptotic in
+    $q^{h}$ with $h<1/100$, hardly small at any finite $\tau$, and is enforced band by band
+    rather than by a single small parameter. What makes the construction work is the estimates,
+    the growth-then-decay of the pulses and the flat residual, and those have no counterpart on
+    the homogenization pages.
+  </p>
+  <p>
+    <strong>There is no unit cell and no search.</strong> Sigmund's microstructure is periodic
+    and passive, and is found by optimization. The pulses are localized, with Gaussian envelopes
+    in dyadic bands, and the auxiliary torus separates them rather than tiling space. The cone
+    condition is met not by searching over microstructures but by shaping the core profiles so
+    that the target lands inside the cone. The design variables are the background, not the
+    cell.
   </p>
   <p>
     <strong>The fast variable is endogenous.</strong> The switching chain does not know about
@@ -217,11 +252,13 @@
   <p>
     Someone who has worked through the two-state switch on the homogenization pages already
     knows the shape of Sections 3, 7, 8 and 9 of the paper: extend to a fast variable, average,
-    impose solvability, solve the cell problem, recurse. What is new is the direction and the
-    two differences above. The bookkeeping is heavier because every order matters and the
-    expansion must be summed, but no step is of a kind the reader has not seen. The
-    <a href="./pulses.html">pulses page</a> is the cell problem, the
-    <a href="./corrections.html">corrections page</a> is the engine.
+    impose solvability, solve the cell problem, recurse. That is orientation, not a proof
+    template. The direction is new, the differences above are new, and the analysis that
+    carries the construction, the instability estimates and the summation to a flat residual,
+    is of a kind the homogenization pages never need. Read the
+    <a href="./pulses.html">pulses page</a> as the analogue of the cell problem and the
+    <a href="./corrections.html">corrections page</a> as the analogue of the engine, and expect
+    the analogy to run out exactly where the estimates begin.
   </p>
 
   <p class="pagenav">Next: <a href="./formal.html">the formal statement</a>.</p>
