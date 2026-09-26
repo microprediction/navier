@@ -111,8 +111,10 @@
     <span><span class="ln gap"></span>connection that does not yet exist</span>
   </div>
   <p class="muted" style="font-size:.92rem">
-    Dashed red edges are the gaps: the unforced problem the construction does not touch, the
-    fixed-noise theorem nobody has, the thermal computation nobody has run. The
+    Dashed red edges are the gaps: the unforced problem the construction does not touch and the
+    thermal computation nobody has run. The solid Agresti edge is a theorem, with the noise set
+    from a bound on the force; the open strengthening, one fixed physical noise for forces of
+    every size, has no edge because no work on either side addresses it. The
     <a href="./bibliography.html">bibliography</a> annotates every node.
   </p>
 
@@ -142,10 +144,10 @@
     ];
     var links=[
       {s:'cmz',t:'openai',l:'strategy'},{s:'cmz',t:'cmzz',l:'extends'},{s:'cmzz',t:'openai',l:'toward full viscosity'},{s:'cmz',t:'ab',l:'smooth forcing'},
-      {s:'feff',t:'openai',l:'alternative (C), (D)'},{s:'abc',t:'openai',l:'unstable vortex'},{s:'cc',t:'openai',l:'pulse waves'},{s:'ds',t:'openai',l:'stress by oscillation'},
+      {s:'feff',t:'openai',l:'alternative (C), (D)'},{s:'abc',t:'openai',l:'similarity-variable instability'},{s:'cc',t:'openai',l:'pulse waves'},{s:'ds',t:'openai',l:'stress by oscillation'},
       {s:'ckn',t:'openai',l:'isolated point allowed'},{s:'ess',t:'openai',l:'escaped via h'},{s:'leray',t:'ckn',l:'weak solutions'},{s:'openai',t:'civ',l:'force must be non-analytic'},
       {s:'fl',t:'agresti',l:'transport noise'},{s:'ll',t:'braun',l:'cutoff'},{s:'homog',t:'ll',l:'averaging'},
-      {s:'openai',t:'agresti',l:'noise tuned to force',gap:true},{s:'openai',t:'ll',l:'thermal seeding: not computed',gap:true},{s:'openai',t:'unforced',l:'no bridge',gap:true},{s:'tao',t:'openai',l:'different move',gap:true},{s:'homog',t:'openai',l:'no scaling theorem',gap:true}
+      {s:'openai',t:'agresti',l:'regular w.h.p.; noise set from force bound'},{s:'openai',t:'ll',l:'thermal seeding: not computed',gap:true},{s:'openai',t:'unforced',l:'no bridge',gap:true},{s:'tao',t:'openai',l:'different move',gap:true},{s:'homog',t:'openai',l:'no scaling theorem',gap:true}
     ];
     var svg=d3.select('#map'),W=1060,H=640; svg.attr('viewBox','0 0 '+W+' '+H);
     var byId={}; nodes.forEach(function(n){byId[n.id]=n; n.r=n.r||9;});

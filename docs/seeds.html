@@ -109,7 +109,9 @@
   <p>
     smaller than any power of the concentration scale $q$. The growth factor $G=1/P(0)$ is the
     reciprocal. At the peak the pulse amplitude is $q^{h/2}$ times the background speed, close
-    to the background itself since $h<1/100$.
+    to the background itself since $h<1/100$, and closer still for the much smaller $h$ the
+    construction actually uses. So the designed seed, relative to the background, is
+    $q^{h/2}/G$.
   </p>
 
   <h2>The thermal seed</h2>
@@ -138,25 +140,31 @@
       <label for="eT">log<sub>10</sub> &epsilon;<sub>T</sub></label>
       <input type="range" id="eT" min="-9" max="-1" step="0.25" value="-4" />
       <span class="val" id="eTVal">&minus;4.00</span>
+      <label for="pk">log<sub>10</sub> q<sup>h/2</sup></label>
+      <input type="range" id="pk" min="-3" max="0" step="0.05" value="-0.5" />
+      <span class="val" id="pkVal">&minus;0.50</span>
     </div>
     <canvas id="seed" width="820" height="280"></canvas>
     <div class="readout" id="seedRead"></div>
   </div>
   <div class="lookfor">
-    What to look for: the designed pulse, seeded at $1/G$, peaks at the intended amplitude. The
-    thermally seeded mode follows the same envelope from a higher start and peaks $G\epsilon_T$
-    times higher. Wherever the orange line crosses the background level, the linear description
-    of the annulus has failed and the pulse cannot deliver its stress as designed. With the
-    default values that happens; drag the thermal seed below $-\log_{10}G$ and it stops. The
-    construction's own seeds sit far below that line at every stage, which is the point.
+    What to look for: the designed pulse, seeded at $q^{h/2}/G$, peaks at $q^{h/2}$ times the
+    background. The thermally seeded mode follows the same envelope from $\epsilon_T$ and peaks
+    at $G\epsilon_T$, so it exceeds the designed pulse by $G\epsilon_T q^{-h/2}$. There are two
+    thresholds. Once the orange peak passes the blue peak, $G\epsilon_T\gtrsim q^{h/2}$, the
+    thermal mode is as large as the designed pulse and can alter the prescribed stress. Once it
+    passes the background, $G\epsilon_T\gtrsim 1$, the linearization of the annulus itself
+    fails. With the default values both happen. The last slider is set away from zero only to
+    separate the two lines; for the $h$ the construction uses, $q^{h/2}$ is within a fraction of
+    a percent of one and the thresholds nearly coincide.
   </div>
 
   <h2>What this does and does not show</h2>
   <p>
     It shows that the constructed solution is not a solution of the thermally fluctuating
     equation with the same force, and that the difference is not small: the unmodelled input to
-    the amplifier exceeds the modelled one by a factor $G\epsilon_T$ that grows without bound as
-    the singular time approaches. It does not show that the thermal equation has no singularity
+    the amplifier exceeds the modelled one by a factor $G\epsilon_T q^{-h/2}$ that grows without
+    bound as the singular time approaches. It does not show that the thermal equation has no singularity
     under this or any force. A turbulent annulus might still concentrate; it would just not do so
     by this construction. And it takes the thermal noise at scale $\ell$ to be present at the
     start of each pulse, which is the fluctuation-dissipation relation at work: viscosity
@@ -185,12 +193,12 @@
 
   <script>
   (function(){
-    var cv=document.getElementById('seed'),ctx=cv.getContext('2d'),GS=document.getElementById('G'),GV=document.getElementById('GVal'),ES=document.getElementById('eT'),EV=document.getElementById('eTVal'),ro=document.getElementById('seedRead');
+    var cv=document.getElementById('seed'),ctx=cv.getContext('2d'),GS=document.getElementById('G'),GV=document.getElementById('GVal'),ES=document.getElementById('eT'),EV=document.getElementById('eTVal'),PS=document.getElementById('pk'),PV=document.getElementById('pkVal'),ro=document.getElementById('seedRead');
     function draw(){
-      var lG=parseFloat(GS.value),lE=parseFloat(ES.value);GV.textContent=lG.toFixed(2);EV.innerHTML=(lE<0?'−':'')+Math.abs(lE).toFixed(2);
+      var lG=parseFloat(GS.value),lE=parseFloat(ES.value),lP=parseFloat(PS.value);GV.textContent=lG.toFixed(2);EV.innerHTML=(lE<0?'−':'')+Math.abs(lE).toFixed(2);PV.innerHTML=(lP<0?'−':'')+Math.abs(lP).toFixed(2);
       var N=300,Ls=1; // Gaussian envelope with P(0)=1/G: exp(-a (v-1/2)^2), a*(1/4)=lG*ln10
       var a=4*lG*Math.LN10;
-      var W=cv.width,H=cv.height,L=64,R=24,T=18,B=40,ymin=Math.min(-lG-1,lE-1),ymax=Math.max(1,lG+lE+1);
+      var W=cv.width,H=cv.height,L=64,R=24,T=18,B=40,ymin=Math.min(lP-lG-1,lE-1),ymax=Math.max(1,lG+lE+1);
       function X(v){return L+v*(W-L-R);} function Y(lg){return T+(ymax-lg)/(ymax-ymin)*(H-T-B);}
       ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
       ctx.strokeStyle='#eee';ctx.lineWidth=1;ctx.font='11px system-ui';ctx.fillStyle='#9a9a9a';ctx.textAlign='right';
@@ -201,12 +209,12 @@
       ctx.strokeStyle='#9a9a9a';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(L,Y(0));ctx.lineTo(W-R,Y(0));ctx.stroke();ctx.setLineDash([]);
       ctx.fillStyle='#5a5a5a';ctx.textAlign='left';ctx.fillText('background speed',L+6,Y(0)-5);
       function curve(offset,color,label){ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();for(var i=0;i<=N;i++){var v=i/N;var lg=offset-a*(v-0.5)*(v-0.5)/Math.LN10;if(i===0)ctx.moveTo(X(v),Y(lg));else ctx.lineTo(X(v),Y(lg));}ctx.stroke();ctx.fillStyle=color;ctx.font='12px system-ui';ctx.fillText(label,X(0.5)+6,Y(offset)+(offset>0?-8:16));}
-      curve(0,'#2a78d6','designed pulse (seed 1/G, peak = background)');
+      curve(lP,'#2a78d6','designed pulse (seed q^{h/2}/G, peak q^{h/2})');
       curve(lG+lE,'#eb6834','thermally seeded mode (seed ε_T)');
-      var over=lG+lE>0;
-      ro.innerHTML='G is the growth factor of a pulse, \u03b5_T the thermal seed relative to the flow. Designed seed 10^'+(-lG).toFixed(2)+'; thermal seed 10^'+lE.toFixed(2)+'; ratio 10^'+(lG+lE).toFixed(2)+'. '+(over?'<b>The thermally seeded mode exceeds the background: the linearization fails before the designed stress is delivered.</b>':'The thermally seeded mode stays below the background over this pulse.');
+      var r=lG+lE-lP,over=lG+lE>0,rival=r>0;
+      ro.innerHTML='G is the growth factor of a pulse, \u03b5_T the thermal seed relative to the background. Designed seed 10^'+(lP-lG).toFixed(2)+'; thermal seed 10^'+lE.toFixed(2)+'; thermal over designed 10^'+r.toFixed(2)+'. '+(over?'<b>The thermal mode exceeds the background: the linearization of the annulus fails.</b>':(rival?'<b>The thermal mode exceeds the designed pulse: the prescribed stress is disrupted, though the linearization still holds.</b>':'The thermal mode stays below the designed pulse over this pulse.'));
     }
-    GS.addEventListener('input',draw);ES.addEventListener('input',draw);draw();
+    GS.addEventListener('input',draw);ES.addEventListener('input',draw);PS.addEventListener('input',draw);draw();
   })();
   </script>
 </main>
