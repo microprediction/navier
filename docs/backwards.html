@@ -153,20 +153,16 @@
     and exterior, and the microstructure is chosen to produce it. A backward map need not
     exist. The admissible stress cone condition of Section 4.3 is the statement that it does:
     the mean stresses two pulse families can produce form the cone $\{c_1v_1+c_2v_2: c_i\ge0\}$,
-    and the core profiles are shaped so that $T$ lies strictly inside it. In the language of
-    composites this is a G-closure question, which effective tensors a class of
-    microstructures can reach, answered here by construction rather than characterized. The
-    design step has a name in composites too: Sigmund called the search for a microstructure
-    with a prescribed effective tensor an inverse homogenization problem, and solved it by
-    optimization over a unit cell. The pulse construction solves a problem of the same logical
-    type, prescribe the average and find the fast structure, but the label should not be
-    pressed further than that; the next section says why. The literature the construction
-    actually descends from is the other one: Nash-style oscillatory blocks that realize a
-    prescribed Reynolds stress, the h-principle of
+    and the core profiles are shaped so that $T$ lies strictly inside it. This move, oscillatory
+    blocks that realize a prescribed Reynolds stress, is the h-principle of
     <a href="./bibliography.html#DS2017">Daneri and Sz&eacute;kelyhidi</a> and the convex
     integration of <a href="./bibliography.html#BV2019">Buckmaster and Vicol</a>, where an
-    auxiliary periodic variable does the same separating job as the torus here. The bridge to
-    the composites vocabulary is this page's, not the paper's and not the literature's.
+    auxiliary periodic variable does the same separating job as the torus here. That is the
+    literature the construction descends from. As an aside, composites has words for the same
+    two questions: <a href="./bibliography.html#Sigmund1994">Sigmund</a> called the search for
+    a microstructure with a prescribed effective tensor inverse homogenization, and the set of
+    reachable tensors is a <a href="./bibliography.html#Milton2002">G-closure</a>. The
+    resemblance is in the shape of the question and goes no further; the next section says why.
   </p>
   <p>
     The solvability condition changes sides too. In homogenization it is a constraint one
@@ -185,11 +181,11 @@
     are the ones that explain the fluctuation pages.
   </p>
   <p>
-    <strong>The target is a source, not a constitutive law.</strong> Inverse homogenization
-    prescribes an effective tensor, a coefficient in the averaged equation. The pulses prescribe
-    a forcing term, the divergence of a Reynolds stress, pointwise in the slow variables. The
-    constitutive structure of the mean equation is untouched. Nothing is being replaced by an
-    effective medium; a missing term is being supplied.
+    <strong>The target is a term, not a coefficient.</strong> Homogenization delivers effective
+    coefficients: a diffusivity, a conductivity, an eddy viscosity. The pulses deliver a forcing
+    term, the divergence of a Reynolds stress, pointwise in the slow variables. The coefficients
+    of the mean equation are untouched. Nothing is being replaced by an effective medium; a
+    missing term is being supplied.
   </p>
   <p>
     <strong>There is no homogenization limit.</strong> Homogenization sends a scale ratio to
@@ -202,12 +198,11 @@
     the homogenization pages.
   </p>
   <p>
-    <strong>There is no unit cell and no search.</strong> Sigmund's microstructure is periodic
-    and passive, and is found by optimization. The pulses are localized, with Gaussian envelopes
-    in dyadic bands, and the auxiliary torus separates them rather than tiling space. The cone
-    condition is met not by searching over microstructures but by shaping the core profiles so
-    that the target lands inside the cone. The design variables are the background, not the
-    cell.
+    <strong>There is no periodic cell.</strong> Homogenization averages over a cell that tiles
+    space, or over a stationary ensemble. The pulses are localized, with Gaussian envelopes in
+    dyadic bands, and the auxiliary torus separates them rather than tiling anything. The cone
+    condition is met by shaping the core profiles so that the target lands inside the cone; the
+    design variables are the background, not the cell.
   </p>
   <p>
     <strong>The fast variable is endogenous.</strong> The switching chain does not know about
