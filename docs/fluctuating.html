@@ -165,13 +165,18 @@
     Agresti proves that for any bound $M$ on the data and any $\epsilon>0$ there is a noise
     intensity and spectrum for which the equation on the torus has a unique global smooth
     solution with probability at least $1-\epsilon$, and states in his Remark 4.4 that the
-    result extends to a deterministic force $f$ that is smooth with spatial derivatives bounded
-    uniformly in time.
+    result extends to a deterministic force $f=f_0+\nabla\!\cdot F$ satisfying a
+    time-integrability and exponential-decay condition: $f_0$ integrable in time, $F$ in a
+    mixed $L^p_tL^q_x$ space, and $e^{\alpha_0 t}\|F(t)\|_{L^2_x}$ square-integrable in time,
+    all bounded by $M$. Smoothness with spatial derivatives bounded uniformly in time is what
+    the remark asks for the regularity conclusion, not a substitute for the decay: a nonzero
+    constant force is smooth and fails the hypothesis.
   </p>
   <p>
-    The constructed force qualifies: it is $C_c^\infty$. So the periodic equation with the
-    constructed force and a suitable transport noise has a global smooth solution with high
-    probability. For that equation the conclusion of the theorem fails. The mechanism is the one
+    The constructed force qualifies: it is $C_c^\infty$ with compact support in time, so every
+    one of those norms is finite, and the periodic equation with the constructed force and a
+    suitable transport noise has a global smooth solution with high probability. For that
+    equation the conclusion of the theorem fails. The mechanism is the one
     the first point predicts: in the scaling limit the transport noise acts as an additional
     eddy viscosity with enhanced dissipation, the flow under the fixed force is a different flow,
     and the fine balance is gone. There is no contradiction with the theorem holding for every
@@ -246,7 +251,7 @@
     <thead><tr><th>Fluctuating model</th><th>What is proved</th><th>Constructed singularity</th></tr></thead>
     <tbody>
       <tr><td>Fast exogenous switch</td><td>Averaging holds only while $\lambda\tau\gg1$; nothing about the switched equation near $\tau=0$.</td><td>Pre-tuned force is wrong after the last switch. Fate open.</td></tr>
-      <tr><td>Transport noise</td><td>Global smooth solution with high probability for any smooth force, noise chosen after the force (Agresti 2026).</td><td>Does not survive, with high probability.</td></tr>
+      <tr><td>Transport noise</td><td>Global smooth solution with high probability for the constructed smooth, compactly time-supported force, noise chosen after the force (Agresti 2026).</td><td>Does not survive, with high probability.</td></tr>
       <tr><td>Thermal noise</td><td>No theorem. Additive-noise regularization is inconclusive.</td><td>Heuristically swamped at the seed stage. Fate open.</td></tr>
       <tr><td>Molecular cutoff</td><td>Finite-dimensional stochastic system with a Lyapunov function; no blow-up.</td><td>Not described by the equations 0.3 ns before it forms.</td></tr>
       <tr><td>Analytic force</td><td>Regular at the singular point for this class of flows (Constantin, Ignatova, Vicol 2026).</td><td>Cannot be built.</td></tr>

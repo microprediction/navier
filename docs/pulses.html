@@ -110,12 +110,22 @@
   </div>
   <p>
     where $T=(T_{r\theta},T_{rz})$ is the annular stress of the <a href="./core.html">core page</a>
-    and the bracket is the angular average. The radial divergence of the left side cancels the
-    leading residual of the background. Note the sizes: the pulse amplitude is
-    $A_{\rm wave}\asymp q^{-1/2-h/2}$, smaller than the background speed $q^{-1/2-h}$ by
-    $q^{h/2}$, but its square divided by the wavelength $q^{1/2+h/2}$ is $q^{-3/2-h}$, exactly the
-    scale of the background residual. The pulses are a lower-order velocity and a leading-order
-    stress.
+    and the bracket is the composition of two averages: the angular average of the ring example
+    above, followed by the normalized average over the auxiliary torus $Y\in\mathbb{T}^2$ of the
+    <a href="#apart">last section</a>,
+    $\langle F\rangle = \langle\langle F\rangle_\theta\rangle_Y$. The paper computes the
+    covariance before evaluating the phase map $Y(r,t)$. The $Y$ average is not cosmetic: it is
+    what assembles the disjoint auxiliary supports into the prescribed slow stress, and at fixed
+    $Y$ the angular covariance alone retains the auxiliary envelope and need not equal $T$. The
+    radial divergence of the left side cancels the leading residual of the background. Note the
+    sizes: the pulse amplitude is $A_{\rm wave}\asymp q^{-1/2-h/2}$, smaller than the background
+    speed $q^{-1/2-h}$ by $q^{h/2}$, so the stress scale is $A_{\rm wave}^2\asymp q^{-1-h}$. Once
+    the carrier oscillation is averaged out, the surviving stress varies on the annular radius
+    $q^{1/2}$, so its radial divergence is $A_{\rm wave}^2/q^{1/2}\asymp q^{-3/2-h}$, exactly
+    the scale of the background residual. The carrier wavelength $q^{1/2+h/2}$ is shorter by
+    $q^{h/2}$, but it is not the scale on which the leading averaged stress is differentiated;
+    the fast phase derivatives belong to the oscillatory linear error and average away. The
+    pulses are a lower-order velocity and a leading-order stress.
   </p>
 
   <h2>Two families and a cone</h2>
@@ -206,7 +216,7 @@
     would be false; it cannot, because $\lambda_0$ and $B_s$ are tied by the midpoint condition.
   </div>
 
-  <h2>Keeping the pulses apart</h2>
+  <h2 id="apart">Keeping the pulses apart</h2>
   <p>
     Pulses on successively finer scales must not interact except where the construction wants
     them to. The paper gives each pulse an auxiliary variable $Y$ on a torus $\mathbb{T}^2$,

@@ -194,10 +194,13 @@
   <pre style="background:#f3f3f7;padding:12px 14px;border-radius:6px;overflow-x:auto;font-size:0.85em;font-family:'SFMono-Regular',Menlo,Consolas,monospace;">theorem_1_1 : ∀ ν > 0, ∃ u p f K,
   CandidateProperties ν u p f K ∧ ¬ Nonempty (GlobalFiniteEnergySolution ν f)</pre>
   <p>
-    A bridge module derives the Clay form from it: the initial datum is the zero field, which
-    satisfies (4) trivially; a compactly supported smooth force satisfies (5); the argument
-    order is swapped from $(t,x)$ to $(x,t)$; and the viscosity is normalized to one by the
-    rescaling on the <a href="./scaling.html">scales page</a>. The periodic corollary compresses
+    The viscosity is handled before the bridge: the proof of <code>theorem_1_1</code> starts
+    from the selected candidate at viscosity one and rescales it to the requested $\nu>0$ by
+    the rescaling on the <a href="./scaling.html">scales page</a>. A bridge module then derives
+    the Clay form, retaining that viscosity and force: the initial datum is the zero field,
+    which satisfies (4) trivially; a compactly supported smooth force satisfies (5); the
+    argument order is swapped from $(t,x)$ to $(x,t)$; and the compact-support and zero-datum
+    witnesses are checked against the comparator definitions. The periodic corollary compresses
     the supports into a quarter cube and sums integer translates, as in Section 10.5 of the
     paper. The whole chain, from the candidate to the two Clay statements, carries the same
     three axioms.

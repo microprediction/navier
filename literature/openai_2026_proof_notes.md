@@ -48,4 +48,4 @@ L_{u_B}(w,π) = ∂_t w + (u_B·∇)w + (w·∇)u_B − Δw + ∇π.
 - Constantin–Ignatova–Vicol arXiv:2609.20803: analytic force + the construction's bounds ⇒ regular.
 - Cao–Chi–Nie arXiv:2609.10262: blow-up forces dense in L¹_t H^s_x, s < 1/2.
 - Duraiswami arXiv:2609.17642: GD1998 porous-wall swirl vs. the core; mechanism not reachable.
-- Agresti arXiv:2607.15140 (v4, 9 Sep 2026): transport noise ⇒ global smooth w.h.p., Remark 4.4 for smooth f.
+- Agresti arXiv:2607.15140 (v4, 9 Sep 2026): transport noise ⇒ global smooth w.h.p., Remark 4.4 for deterministic f = f_0 + div F with L¹_t f_0, L^p_t L^q_x F and e^{α₀t}‖F‖_{L²} in L²_t (the C_c^∞ force qualifies; a smooth force alone does not).

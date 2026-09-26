@@ -187,13 +187,17 @@
 
   <h2>Energy and the comparison</h2>
   <p>
-    The energy identity with a bounded force gives, for $F(t)=\int_0^t\|f(s)\|_2\,ds$,
+    At viscosity one, the manuscript's normalization for the construction, the energy identity
+    with a bounded force gives, for $F(t)=\int_0^t\|f(s)\|_2\,ds$,
   </p>
   <div class="equation-card">
     $$\|u(t)\|_2^2 + 2\int_0^t\|\nabla u(s)\|_2^2\,ds \le F(t)^2\qquad(0\le t<1),$$
   </div>
   <p>
-    so the kinetic energy is bounded and the total dissipation before time one is finite. The
+    which is the paper's Lemma 10.4. For general $\nu$, pairing the equation with $u$ puts a
+    factor $2\nu$ in front of the dissipation integral, and that is the form the rescaled field
+    of the <a href="./scaling.html">scales page</a> satisfies. Either way the kinetic energy is
+    bounded and the total dissipation before time one is finite. The
     theorem then needs one more lemma. If some smooth solution $v$ with the same force and zero
     datum has bounded energy on $[0,T]$ with $T<1$, then $v=u$ there. The proof is a difference
     estimate on expanding balls; the pressure needs separate control because no growth at
