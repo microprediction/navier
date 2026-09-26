@@ -123,8 +123,11 @@
     the carrier oscillation is averaged out, the surviving stress varies on the annular radius
     $q^{1/2}$, so its radial divergence is $A_{\rm wave}^2/q^{1/2}\asymp q^{-3/2-h}$, exactly
     the scale of the background residual. The carrier wavelength $q^{1/2+h/2}$ is shorter by
-    $q^{h/2}$, but it is not the scale on which the leading averaged stress is differentiated;
-    the fast phase derivatives belong to the oscillatory linear error and average away. The
+    $q^{h/2}$, but it is not the scale on which the leading averaged stress is differentiated.
+    The mean part of $w\otimes w$ carries no phase, so it has no fast derivative; in the second
+    harmonic the fast derivatives vanish at leading order because $a\cdot\xi=0$; in the linear
+    term they are balanced by the amplitude equation; what remains goes to the correction
+    cycle. The
     pulses are a lower-order velocity and a leading-order stress.
   </p>
 
@@ -155,7 +158,7 @@
       <text x="120" y="240" font-size="11.5" fill="#5a5a5a">c&#8321;, c&#8322; &gt; 0: both families switched on, neither asked for a negative square</text>
       <text x="70" y="214" font-size="12" fill="#9a9a9a">0</text>
     </svg>
-    <p class="caption">The admissible stress cone. The coefficients stay positive under small perturbations of $v_1$, $v_2$, which is what lets later corrections of either sign be realized by linearizing at the fixed amplitudes.</p>
+    <p class="caption">The admissible stress cone. Strict interiority keeps the coefficients positive under the small errors in $v_1$, $v_2$. Positive amplitudes then allow stress corrections of either sign by linearizing at fixed amplitudes (Proposition 7.6).</p>
   </div>
 
   <h2>Growth, then decay</h2>
@@ -169,7 +172,7 @@
     $$\lambda(v) = \frac{\lambda_0}{\sqrt{1+s(v)^2}},\qquad d_{\rm ref}(v) = \varepsilon k^2 B_s^2\,(1+s(v)^2),$$
   </div>
   <p>
-    with $|E|$ small. The growing coordinate extracts energy from the shear at rate $\lambda$; the
+    with $|E|\le C/S_*$ and $|d-d_{\rm ref}|\le C/S_*$, (7.10)–(7.11). The growing coordinate extracts energy from the shear at rate $\lambda$; the
     damping $d$ is viscosity acting on the squared wavenumber. The shear tilts the wavevector as
     the pulse rides along, which is the linear growth of $s(v)$: tilting weakens the extraction
     and lengthens the wavevector, so the damping overtakes. The net rate
@@ -183,7 +186,8 @@
   <p>
     is Gaussian in $v$: exponentially small at both ends of the pulse interval. That is what
     makes each pulse cut off cleanly, and it is the sense in which each pulse is seeded by an
-    exponentially small force. The energy budget of the pulse is exact:
+    exponentially small force. The principal amplitude equation has an exact energy identity,
+    (7.22):
   </p>
   <div class="equation-card">
     $$\frac12\frac{d}{dv}|t|^2 = -\,g\cdot\big(t_r(t_\theta,t_z)\big) - \varepsilon k^2|n_\Phi|^2\,|t|^2 .$$
@@ -191,9 +195,15 @@
   <p>
     In English: the pulse gains energy from the background shear $g$ through the very momentum
     flux $t_r(t_\theta,t_z)$ that it is there to deliver, and loses it to viscosity. The
-    mechanism that supplies the stress is the mechanism that feeds the pulse. This is Orr's
-    mechanism from shear-flow stability, and the exact waves of Craik and Criminale are the
-    inviscid ancestors.
+    mechanism that supplies the stress is the mechanism that feeds the pulse. Only the component
+    of the flux along the shear exchanges energy; the transverse component is prescribed
+    separately, which is one reason two families are needed. The identity is the one-wave form
+    of the Reynolds&ndash;Orr energy balance. The growth itself is the centrifugal instability of
+    swirling flow with axial shear, in the sense of Leibovich and Stewartson and of Billant and
+    Gallaire, and the shear-induced tilting of the wavevector is what ends it. The exact
+    finite-amplitude waves of Craik and Criminale on affine shear flows, exact solutions of
+    Navier&ndash;Stokes that use the same cancellation of the wave's self-interaction, are the
+    direct ancestors.
   </p>
 
   <div class="widget">
@@ -213,14 +223,15 @@
     along the pulse, they cross once, at the midpoint, and the envelope peaks there. Lengthening
     the pulse deepens the Gaussian tails at both ends, which is the seed becoming smaller. If any
     parameter produced two crossings or a peak away from the midpoint, the envelope bound above
-    would be false; it cannot, because $\lambda_0$ and $B_s$ are tied by the midpoint condition.
+    would be false; it cannot, because $\lambda_0$ and $B_s$ are tied so that the net rate vanishes at the
+    midpoint, and the net rate decreases strictly along the pulse.
   </div>
 
   <h2 id="apart">Keeping the pulses apart</h2>
   <p>
     Pulses on successively finer scales must not interact except where the construction wants
-    them to. The paper gives each pulse an auxiliary variable $Y$ on a torus $\mathbb{T}^2$,
-    computes covariances on that torus, and only afterwards evaluates $Y$ at a fixed phase map
+    them to. The paper extends the field by one auxiliary variable $Y$ on a torus $\mathbb{T}^2$,
+    gives each pulse its own region in $Y$, computes covariances on that torus, and only afterwards evaluates $Y$ at a fixed phase map
     $Y(r,t)$. Pulses whose supports overlap in physical space are given disjoint supports in
     $Y$, so their products vanish identically. Harmonics of the same pulse keep their
     interactions, and those are what the correction cycle handles. Exact incompressibility comes

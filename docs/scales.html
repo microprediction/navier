@@ -95,8 +95,10 @@
     profile constants the theorem never states and $\tau$ in units of a time normalization
     $T_0$. This page is the $h=0$ benchmark with unit constants: $U = \nu/\ell_r$, so
     $U\ell_r=\nu$ for every fluid. The true product is $C_rC_u\,\tau^{-h}$ times that, and with
-    $h<1/100$ the factor $\tau^{-h}$ stays below $1.32$ over the twelve decades between one
-    second and the nanosecond where the continuum fails. The three numbers below are therefore
+    $h<1/100$ the factor $\tau^{-h}$ stays below $1.32$ over the twelve decades from one second,
+    taking $T_0=1\,$s, down to the picosecond where water's continuum fails; for air, whose
+    continuum fails at $0.3\,$ns, it stays below $1.25$. The construction itself forces $h$
+    far below $1/100$ (Lemma 4.8 requires $h<e^{-10}$), which makes the factor below $1.002$. The three numbers below are therefore
     benchmarks accurate to the unknown constants, not exact consequences of the construction.
   </p>
 
@@ -165,11 +167,14 @@
     $e_0\tau^{-A}$ with $A=\tfrac12+h$ and $e_0>0$ a constant of the profile construction that
     the paper does not evaluate, and the relevant core radius is $\sqrt{2X_{\rm in}\tau}$ with
     $X_{\rm in}$ a chosen similarity radius. Restoring $h$ multiplies every speed on this page by
-    $(\tau/T_0)^{-h}$, at most $1.32$ for $h<1/100$ across the range shown, and raises the Mach
-    number and the Knudsen crossing accordingly. A large $e_0$ makes the
-    speed hit the sound barrier earlier in $\tau$, at a larger core radius; a small $X_{\rm in}$
-    makes the radius hit the mean free path earlier. Both move the continuum failure away from
-    the singular time, never toward it. The exponent $h$ changes the powers by less than one
+    $(\tau/T_0)^{-h}$, at most $1.32$ for $h<1/100$ throughout the continuum part of the range shown
+    ($T_0=1\,$s). That raises the Mach number and lowers the thermal ratio accordingly; the
+    Knudsen crossing $\tau^*=\ell_{\rm mfp}^2/\nu$ is unchanged, since the core radius carries
+    no $h$. A large $e_0$ makes the speed hit the sound barrier earlier in $\tau$, at a larger
+    core radius; a small $X_{\rm in}$ makes the radius hit the mean free path earlier. Either
+    moves the continuum failure away from the singular time; a small $e_0$ or a large
+    $X_{\rm in}$ would move it closer. The unit-constant benchmark is neither a best nor a
+    worst case. The exponent $h$ changes the powers by less than one
     part in a hundred and does not affect the conclusion, but it does make $U\ell_r/\nu$ grow
     like $\tau^{-h}$ rather than stay constant; see the <a href="./scaling.html">scales page</a>. The thermal ratio uses the
     Landau&ndash;Lifshitz estimate of velocity variance in a volume $\ell^3$ and is a scaling

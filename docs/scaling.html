@@ -114,9 +114,9 @@
     $$u_\theta^{(0)} = q^{-A}E,\qquad u_z^{(0)} = q^{-A}U,\qquad r\,u_r^{(0)} = V_0,\qquad p^{(0)} = q^{-2A}\Pi .$$
   </div>
   <p>
-    In English: swirl and axial speed grow like $q^{-1/2-h}$, the radial inflow is weaker by a
-    factor $q^{h}$, and the pressure is the square of the speed. Regularity on the axis is a
-    condition on the profiles, $E/\sqrt{2X}$ smooth at $X=0$, and incompressibility fixes $V_0$
+    In English: swirl and axial speed grow like $q^{-1/2-h}$, the radial inflow is weaker by at
+    least a factor of order $q^{h}$, and the pressure is the square of the speed. Regularity on the
+    axis is a condition on the profiles, $E/\sqrt{2X}$, $U$ and $V_0/X$ smooth at $X=0$, and incompressibility fixes $V_0$
     from $U$.
   </p>
 
@@ -131,7 +131,7 @@
       <tr><td>core radius $\ell_r$</td><td>$\tau^{1/2}$</td><td>the viscous length; shrinks</td></tr>
       <tr><td>core height $\ell_z$</td><td>$\tau^{1/2-h}$</td><td>shrinks, but slower: $\ell_r/\ell_z\asymp\tau^{h}\to 0$</td></tr>
       <tr><td>swirl, axial speed</td><td>$\tau^{-1/2-h}$</td><td>unbounded</td></tr>
-      <tr><td>radial speed</td><td>$O(\tau^{-1/2})$</td><td>unbounded, but smaller by $\tau^{h}$</td></tr>
+      <tr><td>radial speed</td><td>$O(\tau^{-1/2})$</td><td>unbounded, but smaller by at least order $\tau^{h}$</td></tr>
       <tr><td>core volume</td><td>$\tau^{3/2-h}$</td><td>vanishes</td></tr>
       <tr><td>core energy</td><td>$\tau^{1/2-3h}$</td><td>vanishes, since $h<1/6$</td></tr>
       <tr><td>core dissipation rate</td><td>$\tau^{-1/2-3h}$</td><td>diverges but is integrable in time</td></tr>
@@ -144,7 +144,7 @@
   <div class="widget">
     <div class="controls">
       <label for="h">exponent h</label>
-      <input type="range" id="h" min="0.001" max="0.16" step="0.001" value="0.01" />
+      <input type="range" id="h" min="0.001" max="0.2" step="0.001" value="0.01" />
       <span class="val" id="hVal">0.010</span>
       <button id="toggle" class="on">core energy</button>
     </div>
@@ -154,17 +154,17 @@
   <div class="lookfor">
     What to look for: the speed line rises and the energy line falls for every $h$ below $1/6$,
     and the two length lines separate. Push $h$ toward $1/6$ and the energy line flattens; past it
-    the energy would grow and the theorem's bounded-energy claim would fail. The paper keeps
-    $h<1/100$, far from that edge, because the correction cycle needs room, not because the
-    energy does.
+    the energy would grow and the theorem's bounded-energy claim would fail. The theorem states
+    $h<1/100$, far from that edge, and the profile construction (Lemma 4.8) in fact forces
+    $h<e^{-T_d}$ with $T_d>10$, far smaller still. The energy is not what limits $h$.
   </div>
 
   <h2>Why the anisotropy</h2>
   <p>
     With $h=0$ the core would be an isotropic self-similar vortex with speed $\tau^{-1/2}$. Such
     a flow has $\int|u|^3$ bounded, and by Escauriaza, Seregin and &Scaron;ver&aacute;k that
-    cannot blow up without a force, and by the scaling argument of Ne&ccaron;as, R&#367;&#382;i&ccaron;ka and
-    &Scaron;ver&aacute;k there is no nontrivial self-similar profile at all. A positive $h$ is a
+    cannot blow up without a force, and by Ne&ccaron;as, R&#367;&#382;i&ccaron;ka and &Scaron;ver&aacute;k, extended by Tsai,
+    there is no nontrivial backward self-similar profile in $L^3$ or $L^p$, $p>3$. A positive $h$ is a
     way past both. The speed exceeds the critical rate $\tau^{-1/2}$ by $\tau^{-h}$, the column
     is slender enough for the energy $\tau^{1/2-3h}$ still to vanish, and the axial direction
     supplies a second small parameter, $\ell_r^2/\ell_z^2 = \tau^{2h}$, in which the background can
@@ -198,7 +198,8 @@
   <p>
     which is the angular Reynolds number of the table, growing slowly rather than constant. The
     speed $\sqrt{\nu/\tau}$ is the $h=0$ reference; the actual speed exceeds it by
-    $\tau^{-h}$, a factor below $1.32$ over twelve decades of $\tau$ when $h<1/100$.
+    $\tau^{-h}$, a factor below $1.32$ over twelve decades of $\tau$ below $T_0$ when $h<1/100$,
+    and below $1.002$ for the much smaller $h$ the construction actually uses.
   </p>
 
   <p class="pagenav">Next: <a href="./core.html">the core</a>.</p>

@@ -86,7 +86,7 @@
 
 <main>
   <h1>Can fluctuations break it?</h1>
-  <p class="subtitle">Four ways to make the equations fluctuate, and what each does to the constructed singularity.</p>
+  <p class="subtitle">Four ways to make the equations fluctuate, one way to restrict the force, and what each does to the constructed singularity.</p>
 
   <p class="lead">
     The construction is a statement about one equation with one force. A real fluid is not that
@@ -119,7 +119,7 @@
       the same flow; the mismatch is the size of the change times the size of the flow's
       derivatives, and those diverge. A perturbation of relative size $\epsilon$ in the
       viscous term produces a residual $\epsilon\,\nu\Delta u\asymp\epsilon\,\tau^{-3/2-h}$,
-      the same order as the terms the construction spent 166 pages cancelling.</li>
+      the same order as the terms the construction spent a 166-page manuscript cancelling.</li>
     <li><strong>The seeds are exponentially small.</strong> Each pulse starts at a Gaussian
       tail, $P(0)\le e^{-cL_s/4}$ with $L_s\asymp(\log 1/q)^2$, and is amplified by the shear to
       an amplitude comparable to the background. Anything else that seeds the same instability
@@ -151,8 +151,8 @@
     equation has a different one, and by the first point above the pre-tuned force is wrong
     by a term of the leading order. The singularity outruns the averaging. Whether the switched
     equation admits any fixed force that blows up along almost every path of the chain is open.
-    Cao, Chi and Nie show that from any smooth state there are nearby forces that produce
-    blow-up, but a fixed force must be chosen before the path is known, so their density result
+    Cao, Chi and Nie show that from any smooth state there are nearby forces, in a weak
+    $L^1_tH^s_x$ sense with $s<1/2$, that produce blow-up, but a fixed force must be chosen before the path is known, so their density result
     does not answer it.
   </p>
 
@@ -160,8 +160,10 @@
   <p>
     Replace the unresolved small-scale velocity by a stochastic transport term: fluid parcels
     move with the resolved velocity plus a rapidly fluctuating, divergence-free, Stratonovich
-    noise with a prescribed spectrum. This is the model of Flandoli and Luo, and of Agresti,
-    and it is derived from Newton's law with a separation of scales. Here there is a theorem.
+    noise with a prescribed spectrum. This is a model in the line of Flandoli and Luo, who used a
+    vorticity-form version, and of Agresti, motivated by a derivation from Newton's law that
+    assumes an idealized separation of scales. Here there is a theorem for the unforced equation,
+    and a remark with a sketched proof extending it to forces like the constructed one.
     Agresti proves that for any bound $M$ on the data and any $\epsilon>0$ there is a noise
     intensity and spectrum for which the equation on the torus has a unique global smooth
     solution with probability at least $1-\epsilon$, and states in his Remark 4.4 that the
@@ -184,12 +186,14 @@
     force's design.
   </p>
   <p>
-    The caveats are real. The noise is chosen after the force, with intensity depending on its
-    size; whether a fixed physical noise defeats every force is a different and open question,
+    The caveats are real. The noise is chosen after a bound on the force: Agresti's noise depends on
+    $f$ only through $M$ and $\alpha_0$, so one noise handles every force below a given size.
+    Whether one fixed physical noise defeats forces of every size is a different and open question,
     and the natural next construction would be a force built to blow up through the noise.
     The noise is multiplicative and scale-invariant, a model of turbulent transport, not of
-    molecular motion. And "with high probability" is not "surely". Still, this is the one
-    fluctuating model in which the constructed singularity is known not to survive.
+    molecular motion. And "with high probability" is not "surely". Still, this is the one model
+    that stays a continuum equation in which the constructed singularity is known not to
+    survive; the molecular cutoff below removes it trivially, by truncation.
   </p>
 
   <h2>Model 3: thermal noise</h2>
@@ -206,8 +210,9 @@
     There is a heuristic. The velocity fluctuation thermal noise induces at scale $\ell$ is
     $v_T(\ell)=\sqrt{k_BT/\rho\ell^3}$, and relative to the core speed $\nu/\ell$ this is
     $\sqrt{k_BT/\rho\ell}\,/\nu$, a fraction that grows as the core shrinks and reaches about a
-    percent at the mean free path in air. That is many orders of magnitude above the
-    exponentially small seeds of the construction, at every scale the construction uses. The
+    percent at the mean free path in air. Asymptotically that exceeds the
+    exponentially small seeds of the construction by more than any power of $q$; at a given
+    physical scale the comparison depends on constants the paper does not evaluate. The
     <a href="./seeds.html">seeds page</a> puts the two numbers side by side. Thermal noise
     projected onto the growing direction of the pulse equation is amplified by the same factor
     the designed seed is, and if it reaches the background amplitude the linearization fails and
@@ -248,19 +253,19 @@
 
   <h2>Verdict</h2>
   <div class="table-wrap"><table class="impl">
-    <thead><tr><th>Fluctuating model</th><th>What is proved</th><th>Constructed singularity</th></tr></thead>
+    <thead><tr><th>Model</th><th>What is proved</th><th>Constructed singularity</th></tr></thead>
     <tbody>
       <tr><td>Fast exogenous switch</td><td>Averaging holds only while $\lambda\tau\gg1$; nothing about the switched equation near $\tau=0$.</td><td>Pre-tuned force is wrong after the last switch. Fate open.</td></tr>
-      <tr><td>Transport noise</td><td>Global smooth solution with high probability for the constructed smooth, compactly time-supported force, noise chosen after the force (Agresti 2026).</td><td>Does not survive, with high probability.</td></tr>
+      <tr><td>Transport noise</td><td>Theorem for the unforced equation; by Remark 4.4, with a sketched proof, global smooth solution with high probability for the constructed smooth, compactly time-supported force, noise chosen after the force (Agresti 2026).</td><td>Does not survive, with high probability.</td></tr>
       <tr><td>Thermal noise</td><td>No theorem. Additive-noise regularization is inconclusive.</td><td>Heuristically swamped at the seed stage. Fate open.</td></tr>
       <tr><td>Molecular cutoff</td><td>Finite-dimensional stochastic system with a Lyapunov function; no blow-up.</td><td>Not described by the equations 0.3 ns before it forms.</td></tr>
-      <tr><td>Analytic force</td><td>Regular at the singular point for this class of flows (Constantin, Ignatova, Vicol 2026).</td><td>Cannot be built.</td></tr>
+      <tr><td>Analytic force</td><td>Regular at the singular point for this class of flows (Constantin, Ignatova, Vicol 2026).</td><td>Cannot be built by this construction or any with its anisotropic bounds, axisymmetric core and a $C^2$-bounded force; general case open.</td></tr>
     </tbody>
   </table></div>
   <p>
     Neither reading dominates. The theorem is correct about its equation and the equation is
-    not the fluid at the scale where the theorem bites. The fluctuating models that are known to
-    be regular achieve it by tuning the noise to the force, which is the same move the theorem
+    not the fluid at the scale where the theorem bites. The regular continuum models achieve it by
+    choosing the noise after a bound on the force, which is the same move the theorem
     makes in the other direction. The question that would settle more is whether a fixed
     physical noise defeats every smooth force, and nobody has proved that.
   </p>
@@ -275,8 +280,8 @@
       <a href="./seeds.html">seeds page</a> is the back of the envelope for that.</li>
     <li>The constants. The theorem never states the prefactor $e_0$ or the profile scales, and
       the molecular estimates on the <a href="./scales.html">molecular limit</a> page set them
-      to one. A construction with enormous constants would move the continuum failure earlier,
-      not later.</li>
+      to one. A large velocity prefactor would move the Mach-number failure earlier; the
+      mean-free-path crossing depends on the length constants, in either direction.</li>
   </ul>
 
   <p class="pagenav">Next: <a href="./scales.html">the molecular limit</a>.</p>

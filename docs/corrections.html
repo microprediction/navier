@@ -91,7 +91,7 @@
   <p class="lead">
     After the pulses, the residual still contains the errors of the linearization, the
     interactions between harmonics, the terms produced by curls and cutoffs, and defects in
-    five radial integrals. The construction removes these in a cycle whose only virtue is that it
+    three radial integrals, to be removed while preserving two others. The construction removes these in a cycle whose only virtue is that it
     can be repeated. Each repetition buys a fixed improvement in the rate at which the residual
     vanishes.
   </p>
@@ -134,7 +134,8 @@
   <h2>The exponent that improves</h2>
   <p>
     The residual at stage $j$ is bounded, for Cartesian derivatives of order $m$, by
-    $q^{h\sigma_j - K_m}$ up to logarithms, with $K_m$ independent of $j$. One cycle gives
+    $q^{h\sigma_j - K_m}$ up to logarithms, with $K_m$ independent of $j$, plus a separately
+    retained remainder that is $O(q^N)$ for every $N$. One cycle gives
   </p>
   <div class="equation-card">
     $$\sigma_0 = \tfrac15,\qquad \sigma_{j+1} = \sigma_j + \tfrac1{10},\qquad \sigma_j = \tfrac15 + \tfrac{j}{10}\longrightarrow\infty .$$
@@ -143,7 +144,8 @@
     Each cycle is worth a tenth of a power of $q^{h}$. Since $h<1/100$, each cycle is worth
     less than a thousandth of a power of $q$. The number of cycles is unbounded, so this is
     enough, but it is why the construction cannot afford to be careless with any term of any
-    order: a single dropped term of relative size $q^{0.001}$ would undo a cycle.
+    order: a single dropped term that is smaller than the current residual only by a factor
+    $q^{h/10}$, less than $q^{0.001}$, would undo a cycle.
   </p>
 
   <h2>Summation with shrinking cutoffs</h2>
@@ -159,9 +161,9 @@
     $$\big|\partial_x^\alpha\partial_t^b\,\mathcal{R}(u,p)\big| \le C_{\alpha,b,N,X_1}\,q^{N}\qquad (0\le X\le X_1,\ q\downarrow 0).$$
   </div>
   <p>
-    This is the flatness estimate, Theorem 3.1(iii). Outside a fixed radius the residual is
-    identically zero because the exterior is an exact heat flow. Between, the estimate is
-    uniform on compact sets. In English: near the singular point the leftover force and all its
+    This is the flatness estimate, Theorem 3.1(iii). Outside the shrinking similarity radius
+    $X\ge X_{\rm ext}$, that is $r\ge\sqrt{2X_{\rm ext}q}$, the residual is identically zero
+    because the exterior is an exact heat flow. In English: near the singular point the leftover force and all its
     derivatives are smaller than any power of the time remaining.
   </p>
 

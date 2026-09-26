@@ -97,8 +97,8 @@
   <h2>Spin-up</h2>
   <p>
     A fluid parcel that feels no torque conserves its angular momentum per unit mass, $r u_\theta$.
-    Carry it inward and its swirl grows like $1/r$. This is the bathtub vortex, and it is the only
-    amplifying mechanism the construction needs in the core. Inflow carries angular momentum
+    Carry it inward and its swirl grows like $1/r$. This is the bathtub vortex, and it is the core's
+    spin-up mechanism. Inflow carries angular momentum
     toward the axis; viscosity diffuses it back out; the balance of the two sets the rate at
     which the characteristic speed grows.
   </p>
@@ -107,15 +107,17 @@
     on the axis, so the core has axial outflow: fluid arriving at small radius leaves upward on
     one side of a dividing layer near $z=0$ and downward on the other. Pressure decreases toward
     the axis, so the pressure force $-\nabla p$ points inward and supplies the centripetal force
-    for the swirl; near the axis its axial component points toward the mid-plane. The gradient
-    itself points outward, as the radial balance $\partial_r p = u_\theta^2/r>0$ below records.
+    for the swirl; near the axis its axial component points toward the mid-plane. The radial
+    component of the gradient points outward, as the radial balance
+    $\partial_r p = u_\theta^2/r\ge 0$ below records.
   </p>
 
   <h2>Symmetry, deliberately broken</h2>
   <p>
-    The obvious profile would be reflection-symmetric in $z$. The paper does not use it. On the
-    mid-plane $z=0$ an exactly symmetric axial flow vanishes, and with it the radial shear of
-    axial velocity that the pulses in the annulus need for their amplification. Away from the
+    The obvious profile would be reflection-symmetric in $z$. The paper does not use it. Under exact
+    symmetry both amplifying mechanisms fail on the mid-plane $z=0$: axial transport of angular
+    momentum vanishes there, and so does the axial velocity, and with it the radial shear of
+    axial velocity that the pulses in the annulus could otherwise use. Away from the
     mid-plane, axial transport of angular momentum supplies a steep radial fall in angular
     velocity, and the rotational mechanism amplifies pulses on its own. The profile is therefore
     given a small upward bias with nonzero axial velocity at $z=0$. This separates the layer where
@@ -137,10 +139,11 @@
     infinity. The radial flux $V_0$ is fixed by incompressibility from $U$. What remains is to
     choose $E$ and $U$ so that the tangential momentum equations, azimuthal and axial, hold to
     leading order in the core. The paper solves these near the axis as an analytic problem in
-    $(X,\eta)$, with $E/\sqrt{2X}$ and $U$ smooth at $X=0$, which is what makes the Cartesian
+    $(X,\eta)$, with $E/\sqrt{2X}$, $U$ and $V_0/X$ smooth at $X=0$, which is what makes the Cartesian
     field smooth on the axis for every $t<1$. Regularity on the axis is not automatic in
-    cylindrical coordinates and the construction pays for it throughout: every correction is
-    built from vector potentials whose curl is smooth there.
+    cylindrical coordinates and the construction pays for it throughout: every velocity
+    correction is written as the curl of a vector potential plus an azimuthal term $B\,e_\theta$,
+    both smooth at the axis.
   </p>
   <p>
     A single displayed fact carries the theorem. For a fixed $X_{\rm in}$ inside the core,
@@ -167,11 +170,12 @@
   <p>
     This is the azimuthal component of the Stokes equations, a radial heat equation for the
     swirl. It is solved exactly, so its residual is zero and no force is needed there. Its profile
-    decays like $r^{-1-2h}$ at large radius, matching the core's $E\sim c_\infty X^{-1/2-h}$, and
+    decays like $r^{-1-2h}$ at large radius, matching the leading profile's tail $E\sim c_\infty X^{-1/2-h}$, and
     at every fixed positive radius the field and all its derivatives have smooth limits as
-    $\tau\downarrow 0$. That last property is what allows the whole flow to be cut off smoothly in
-    space without disturbing the concentrating core, and it is why the singular point is
-    isolated.
+    $\tau\downarrow 0$. That property, together with the regularity of the inner construction away
+    from the origin, is what allows the whole flow to be cut off smoothly in space without
+    disturbing the concentrating core, and leaves the origin as the only point where the
+    velocity fails to have a limit.
   </p>
 
   <h2>The annulus is the problem</h2>
@@ -185,9 +189,10 @@
     $$R_\theta^{(0)} = -(\partial_r + 2/r)\,T_{r\theta},\qquad R_z^{(0)} = -(\partial_r + 1/r)\,T_{rz},$$
   </div>
   <p>
-    with $T$ obtained by integrating the residuals in from the axis. Five radial moment
-    conditions, matched at the join, make $T$ vanish inside the core and outside the exterior
-    radius, so the stress is supported in an annulus $X_a < X < X_b$ and nowhere else. The
+    with $T$ obtained by integrating the residuals in from the axis. The inner profiles satisfy
+    the profile equations exactly, so $T$ vanishes in the core; two zero radial moments of the
+    residual make it vanish beyond the exterior radius; and five cumulative radial integrals,
+    matched at the join, keep the exterior fields unchanged. So the stress is supported in an annulus $X_a < X < X_b$ and nowhere else. The
     background residual there scales like $q^{-3/2-h}$ and does not extend through $\tau=0$. It
     has to be supplied by something that is not an external force. The
     <a href="./pulses.html">next page</a> is about the something.

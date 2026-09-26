@@ -96,9 +96,11 @@
   </div>
   <p>
     Set $f := \mathcal{R}(u,p)$. Then $(u,p,f)$ solves the forced Navier&ndash;Stokes equations,
-    by definition. There is nothing to prove about existence. What must be proved is that a
+    by definition. There is nothing to prove about existence. The main thing to prove is that a
     $u$ exists which becomes unbounded at time one while $\mathcal{R}(u,p)$, together with
-    every space-time derivative of it, extends smoothly through time one. The paper calls
+    every space-time derivative of it, extends smoothly through time one. Bounded energy, compact
+    support, and a uniqueness argument ruling out any other smooth solution with the same force
+    are the remaining steps. The paper calls
     $\mathcal{R}$ the momentum residual, and the entire construction is an exercise in
     cancellation inside it.
   </p>
@@ -108,7 +110,8 @@
     Take any self-similar profile that concentrates, say $u(x,t) = \tau^{-1/2}U(x/\tau^{1/2})$
     with $\tau=1-t$. Each term of the residual scales like $\tau^{-3/2}$. The residual of a
     generic profile therefore diverges like $\tau^{-3/2}$ at the singular point, and the force
-    needed to sustain the flow is as singular as the flow. Nothing is gained.
+    needed to sustain the flow blows up at the same self-similar rate as the flow's own
+    acceleration. Nothing is gained.
   </p>
   <p>
     The way out is to make the terms cancel. Individual terms may diverge; the sum must not. In
@@ -116,8 +119,8 @@
     residual there is small by design. In the exterior the flow is an exact solution of a heat
     equation, so the residual is zero. The trouble is in between, in the annulus where the
     concentrating core is joined to the smooth exterior. There the residual of the background is
-    unbounded, of the same order as the terms it is built from, and no choice of axisymmetric
-    profile removes it.
+    unbounded, of the same order as the terms it is built from. The construction does not try to
+    remove it with the axisymmetric profile; it shapes it so that pulses can supply it.
   </p>
 
   <h2>Momentum that the fluid supplies to itself</h2>
@@ -132,7 +135,8 @@
   </div>
   <p>
     The linear term is how the increment evolves in the background. The quadratic term is the
-    divergence of a momentum flux, and its angular average does not vanish even when $w$ does.
+    divergence of a momentum flux, and its angular average does not vanish even when the angular average of $w$
+    does.
     In English: oscillations that average to zero still transport momentum, because the product
     of two zero-mean quantities has a mean. This is the Reynolds stress of turbulence theory,
     used here on purpose. Choose $w$ so that $\nabla\cdot\langle w\otimes w\rangle$ cancels the
@@ -151,7 +155,8 @@
     Cancelling the leading term leaves smaller singular terms: interactions between pulses,
     the errors of the linearization, cutoffs. The construction removes these in a fixed cycle,
     recomputing the full residual after every operation so that nothing is dropped. Each cycle
-    improves the rate at which the residual vanishes by a fixed amount, $\sigma_{j+1}=\sigma_j+\tfrac1{10}$.
+    improves the rate at which the residual vanishes by a fixed amount: the bound on $m$-th
+    derivatives is $q^{h\sigma_j-K_m}$ and $\sigma_{j+1}=\sigma_j+\tfrac1{10}$.
     The corrections are then summed with cutoffs that shrink toward the singular point. The
     outcome is a residual that is flat: every Cartesian space-time derivative is
     $O(q^N)$ for every $N$ as the concentration scale $q\downarrow 0$. A flat function extends
@@ -170,8 +175,9 @@
     The trick is not new. C&oacute;rdoba and Mart&iacute;nez-Zoroa built finite-time singularities
     for forced three-dimensional Euler in 2023 by amplifying increasingly concentrated vortex
     layers while keeping the force in a fixed H&ouml;lder class, and with Zheng extended the method
-    to hypodissipative Navier&ndash;Stokes in 2024. Alp&ouml;ge and Buckmaster pushed the method to
-    smooth forcing for the porous medium, Boussinesq and Euler equations in August 2026. Tao's
+    to hypodissipative Navier&ndash;Stokes in 2024. Alp&ouml;ge, Buckmaster and Coiculescu pushed the method to
+    smooth forcing for the porous medium, Boussinesq and Euler equations in preprints released in
+    September 2026. Tao's
     2016 blow-up for an averaged Navier&ndash;Stokes equation is a different move: it modifies the
     nonlinearity rather than adding a force. The <a href="./map.html">map</a> draws the lineage.
   </p>

@@ -127,16 +127,17 @@
     The formal statement of alternatives (C) and (D) was not written by the authors of the
     proof. It is a copy of the encoding of the Clay problem in Google DeepMind's Formal
     Conjectures project, pinned to commit <code>8bf45ed</code>. Diffing the copy against the
-    upstream file shows only three changes: the placeholders for alternatives (A) and (B) are
-    removed, the namespace is renamed, and two category attributes are dropped. The
-    definitions are otherwise identical. The proof then supplies the two theorems that the
+    upstream file shows only cosmetic changes: the placeholders for alternatives (A) and (B)
+    are removed, the namespace is renamed, the category and AMS attributes are dropped, the
+    imports are replaced by Mathlib with the utility notation inlined, and some docstrings are
+    edited. The definitions and the statements of (C) and (D) are identical. The proof then supplies the two theorems that the
     reference leaves as <code>sorry</code>. This separation is the point: the people who
     chose the definitions are not the people who proved the theorem.
   </p>
 
   <h2>The clauses</h2>
   <p>
-    The theorem for (C), as Lean prints it, is
+    The theorem for (C), as Lean states it (lightly abbreviated), is
   </p>
   <pre style="background:#f3f3f7;padding:12px 14px;border-radius:6px;overflow-x:auto;font-size:0.85em;font-family:'SFMono-Regular',Menlo,Consolas,monospace;">navier_stokes_breakdown_R3 : ∀ nu > 0,
   ∃ u₀ f,
@@ -148,9 +149,9 @@
   <div class="table-wrap"><table class="impl">
     <thead><tr><th>Lean field</th><th>Fefferman</th><th>Formal content</th></tr></thead>
     <tbody>
-      <tr><td>u₀ div_free, smooth</td><td>(2), (3)</td><td>$\nabla\cdot u^\circ=0$ everywhere; $u^\circ\in C^\infty$.</td></tr>
+      <tr><td>u₀ div_free, smooth</td><td>hypothesis of (C), prose after (3)</td><td>$\nabla\cdot u^\circ=0$ everywhere; $u^\circ\in C^\infty$.</td></tr>
       <tr><td>u₀ decay</td><td>(4)</td><td>for every order $m$ and every $K$, some $C$ with $\|\partial^m u^\circ(x)\|\le C(1+|x|)^{-K}$.</td></tr>
-      <tr><td>f smooth</td><td>(5)</td><td>$C^\infty$ on $\mathbb{R}^3\times[0,\infty)$, as a function of $(x,t)$ jointly.</td></tr>
+      <tr><td>f smooth</td><td>(C), with (5)</td><td>$C^\infty$ on $\mathbb{R}^3\times[0,\infty)$, as a function of $(x,t)$ jointly.</td></tr>
       <tr><td>f decay</td><td>(5)</td><td>every space-time derivative bounded by $C(1+|x|+t)^{-K}$ for $t\ge0$.</td></tr>
       <tr><td>navier_stokes</td><td>(1)</td><td>$\partial_t v + (v\cdot\nabla)v = \nu\Delta v - \nabla p + f$ for all $x$ and $t\ge0$, with $\partial_t$ the one-sided derivative within $[0,\infty)$ at $t=0$.</td></tr>
       <tr><td>div_free, initial_condition</td><td>(2), (3)</td><td>$\nabla\cdot v=0$ for $t\ge0$; $v(x,0)=u^\circ(x)$.</td></tr>
@@ -194,7 +195,7 @@
   <pre style="background:#f3f3f7;padding:12px 14px;border-radius:6px;overflow-x:auto;font-size:0.85em;font-family:'SFMono-Regular',Menlo,Consolas,monospace;">theorem_1_1 : ∀ ν > 0, ∃ u p f K,
   CandidateProperties ν u p f K ∧ ¬ Nonempty (GlobalFiniteEnergySolution ν f)</pre>
   <p>
-    The viscosity is handled before the bridge: the proof of <code>theorem_1_1</code> starts
+    The viscosity is handled before the bridge: the proof of <code>theorem_1_1</code>, via <code>theorem_1_1_with_initial_rest</code>, starts
     from the selected candidate at viscosity one and rescales it to the requested $\nu>0$ by
     the rescaling on the <a href="./scaling.html">scales page</a>. A bridge module then derives
     the Clay form, retaining that viscosity and force: the initial datum is the zero field,

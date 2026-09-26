@@ -164,8 +164,8 @@
     </p>
   </div>
   <p>
-    In English: a fluid at rest, pushed by a smooth push that switches off before the singular
-    time and vanishes outside a ball, can be made to spin up without bound at a single point
+    In English: a fluid at rest, pushed by a smooth push that vanishes outside a bounded
+    region of space and time (it is still acting at the singular time and switches off later), can be made to spin up without bound at a single point
     while carrying only a bounded amount of energy. No smooth solution with the same force
     and bounded energy can therefore exist for all time. Compact support gives the periodic
     version as a corollary, which is alternative (D).
@@ -187,8 +187,11 @@
     The theorem settles the forced alternatives (C) and (D). The unforced alternatives (A) and
     (B), which is what most people mean by the regularity problem, are untouched. The force is
     smooth but it is not real analytic, and Constantin, Ignatova and Vicol have since shown that
-    any construction with this one's anisotropic scaling and axisymmetric core needs a
-    non-analytic force that stays active at the singular point. The Lean formalization builds
+    any construction with this one's anisotropic scaling and axisymmetric core, and a force
+    bounded in $C^2$ up to the singular time, needs a
+    force that is not real analytic in space near the singular point and does not vanish
+    identically in any neighbourhood of it, although it vanishes to infinite order at the point
+    itself. The Lean formalization builds
     from source with no <code>sorry</code> and only the three standard axioms, checked here on
     24 September; the <a href="./formal.html">formal statement</a> page compares it with
     Fefferman's conditions clause by clause. The Clay Mathematics Institute describes the

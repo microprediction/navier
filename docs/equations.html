@@ -128,23 +128,24 @@
     derivatives faster than any power, and to forces that do the same in space and time. A
     solution counts as physically reasonable if $u$ and $p$ are $C^\infty$ on
     $\mathbb{R}^3\times[0,\infty)$ and the energy $\int|u|^2\,dx$ is bounded uniformly in time.
-    The periodic version replaces decay by periodicity. The prize goes to a proof of any one of
+    The periodic version replaces decay by periodicity, asks the force to decay only in time,
+    and drops the bounded-energy condition. The prize goes to a proof of any one of
     the following.
   </p>
   <div class="table-wrap"><table class="impl">
     <thead><tr><th>Alt.</th><th>Domain</th><th>Force</th><th>Claim</th></tr></thead>
     <tbody>
       <tr><td>(A)</td><td>$\mathbb{R}^3$</td><td>$f\equiv 0$</td><td>For every smooth decaying $u^\circ$, a smooth bounded-energy solution exists for all time.</td></tr>
-      <tr><td>(B)</td><td>$\mathbb{R}^3/\mathbb{Z}^3$</td><td>$f\equiv 0$</td><td>The same on the torus.</td></tr>
+      <tr><td>(B)</td><td>$\mathbb{R}^3/\mathbb{Z}^3$</td><td>$f\equiv 0$</td><td>The same on the torus, with periodicity and smoothness in place of decay and bounded energy.</td></tr>
       <tr><td>(C)</td><td>$\mathbb{R}^3$</td><td>smooth, decaying</td><td>There exist $u^\circ$ and $f$ for which no smooth bounded-energy solution exists for all time.</td></tr>
-      <tr><td>(D)</td><td>$\mathbb{R}^3/\mathbb{Z}^3$</td><td>smooth, periodic</td><td>The same on the torus.</td></tr>
+      <tr><td>(D)</td><td>$\mathbb{R}^3/\mathbb{Z}^3$</td><td>smooth, periodic</td><td>The same on the torus, with periodicity and smoothness in place of decay and bounded energy.</td></tr>
     </tbody>
   </table></div>
   <p>
     Read the table by columns. The existence alternatives fix $f\equiv 0$: they are about the
-    equations alone. The breakdown alternatives allow the prover to choose a force. That
-    asymmetry was written in deliberately, to give leeway to solvers, and it is the asymmetry the
-    2026 construction uses. It proves (C) with $u^\circ = 0$ and a force that is not merely
+    equations alone. The breakdown alternatives allow the prover to choose a force. Fefferman
+    offers the four alternatives &ldquo;to give reasonable leeway to solvers&rdquo;, and the
+    breakdown alternatives' freedom to choose a force is the leeway the 2026 construction uses. It proves (C) with $u^\circ = 0$ and a force that is not merely
     decaying but compactly supported in space and time, and (D) follows by tiling.
   </p>
   <p>
@@ -174,7 +175,7 @@
     $L^3$ norm cannot blow up. The constructed singularity is one isolated point, and its
     $L^3$ norm is not bounded: the core has volume of order $\tau^{3/2-h}$ and speed of order
     $\tau^{-1/2-h}$, so $\int|u|^3$ over the core is of order $\tau^{-4h}$. It escapes the
-    criterion, as it must.
+    criterion, as any singularity would have to; the criterion extends to smooth forces.
   </p>
 
   <h2>Why a force changes everything</h2>
@@ -186,9 +187,9 @@
     is about that.
   </p>
   <p>
-    This is also why the result is contested as a resolution of the physical problem. Tao's
-    remark that the value of such work lies in insight people can understand, and Silvestre's
-    that the Clay problem is settled but the main problem is not, are both about the force. The
+    This is also why the result is contested as a resolution of the physical problem. Tao has
+    written that it should be possible to do without the forcing term, and Silvestre that the
+    Clay problem is settled but the main problem is not; both remarks are about the force. The
     <a href="./status.html">status page</a> records who has said what.
   </p>
 

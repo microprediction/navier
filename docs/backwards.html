@@ -137,9 +137,9 @@
       <tr><td>the averaging operator $\langle\cdot\rangle$</td><td>angular average composed with Haar average on $Y$, equation (3.8)</td></tr>
       <tr><td>the averaged equation for the slow quantity</td><td>the angularly averaged mean equations of Section 8</td></tr>
       <tr><td>the cell problem that determines the corrector</td><td>the amplitude equation (7.5) for each harmonic $m$, with its own pressure $\pi_m$</td></tr>
-      <tr><td>solvability, the Fredholm alternative for the fast operator: $Lw=f$ has a solution only if $\langle f\rangle=0$</td><td>the fast auxiliary-time derivative is inverted only on zero-mean functions, (8.19); the mean part is passed to the slow correction; the five radial moment equations (8.25) are the finite-dimensional cokernel of that correction</td></tr>
+      <tr><td>solvability, a Fredholm-type alternative for the fast operator: $Lw=f$ has a solution only if $\langle f\rangle=0$</td><td>the fast auxiliary-time derivative is inverted only on zero-mean functions, (8.19), by Fourier series with the small-divisor bound (6.7); the mean part is passed to the slow correction, whose three radial defects are the finite-dimensional obstruction; the five equations (8.25) cancel them while keeping two moment constraints</td></tr>
       <tr><td>initial layers on the fast time scale</td><td>the Gaussian tails of each pulse envelope, cut off where they are exponentially small</td></tr>
-      <tr><td>the engine: a recursion to every order in $\varepsilon=1/\lambda$</td><td>the correction cycle $\sigma_{j+1}=\sigma_j+\tfrac1{10}$ in $\varepsilon=q^{h}$, plus the background expansion in $q^{2nh}$ of Section 5</td></tr>
+      <tr><td>the engine: a recursion to every order in $\varepsilon=1/\lambda$</td><td>the correction cycle $\sigma_{j+1}=\sigma_j+\tfrac1{10}$ in $\varepsilon=Q^{h}\asymp q^{h}$, plus the background expansion in $q^{2nh}$ of Section 5</td></tr>
       <tr><td>Green&ndash;Kubo: fluctuations raise the mean by half their variance</td><td>the Reynolds stress $\langle w\otimes w\rangle$ in the mean momentum equation</td></tr>
       <tr><td>convergence orders, one stopping point</td><td>an infinite sum with shrinking cutoffs, because the residual must be flat, not small at a fixed order</td></tr>
     </tbody>
@@ -153,7 +153,8 @@
     and exterior, and the microstructure is chosen to produce it. A backward map need not
     exist. The admissible stress cone condition of Section 4.3 is the statement that it does:
     the mean stresses two pulse families can produce form the cone $\{c_1v_1+c_2v_2: c_i\ge0\}$,
-    and the core profiles are shaped so that $T$ lies strictly inside it. This move, oscillatory
+    and the leading profiles are shaped in the annulus (Appendix C) so that $T$ lies strictly
+    inside it. This move, oscillatory
     blocks that realize a prescribed Reynolds stress, is the h-principle of
     <a href="./bibliography.html#DS2017">Daneri and Sz&eacute;kelyhidi</a> and the convex
     integration of <a href="./bibliography.html#BV2019">Buckmaster and Vicol</a>, where an
@@ -165,19 +166,22 @@
     resemblance is in the shape of the question and goes no further; the next section says why.
   </p>
   <p>
-    The solvability condition changes sides too, and here the shared anchor is not an analogy
-    but a theorem both sides use: the Fredholm alternative. The fast operator is a derivative
-    in the phase or auxiliary variable on a torus. Its kernel and cokernel are the constants, so
-    $Lw=f$ is solvable exactly when $f$ has zero mean, and the solution is unique up to a
-    constant. In homogenization this is a constraint one discovers: the corrector equation has
+    The solvability condition changes sides too, and here the two share a genuine structure
+    rather than an analogy: a Fredholm-type alternative. The fast operator is a derivative
+    along a direction on the auxiliary torus that the paper keeps Diophantine, (6.7). Its
+    kernel is the constants and it inverts every smooth zero-mean function, with a loss of
+    four derivatives (Lemma 8.6), so $Lw=f$ is solvable exactly when $f$ has zero mean. The
+    paper proves this by Fourier series and a small-divisor bound, not by Fredholm theory; the
+    operator is not Fredholm on any fixed $C^m$ space, since its range is not closed. In homogenization this is a constraint one discovers: the corrector equation has
     a solution only when the source averages to zero, and that requirement is what produces
     the averaged equation. In the construction it is a design rule: anything with nonzero mean
     cannot be cancelled by a wave and must be routed to the mean-flow correction. The
-    mean-flow correction has its own finite-dimensional obstruction, the five radial moments,
-    and the paper hits it with a five-parameter family of bumps, which is the Lyapunov&ndash;Schmidt
-    pattern: solve on the range, then adjust finitely many parameters to kill the cokernel.
-    Section 8 is a Fredholm argument written as an algorithm, run once per harmonic and per
-    order and then summed.
+    mean-flow correction has its own finite-dimensional obstruction, three radial integral
+    defects, and the paper cancels them with a five-parameter family of bumps that also keeps
+    two moment constraints. That is the Lyapunov&ndash;Schmidt pattern: solve on the range, then
+    adjust finitely many parameters to kill the obstruction. Sections 7 to 9 together are this
+    argument written as an algorithm: Section 7 for each nonzero harmonic, Section 8 for the
+    mean, repeated per order in Proposition 9.6 and summed in Proposition 9.9.
   </p>
 
   <h2>Where the analogy breaks</h2>
@@ -204,11 +208,13 @@
     the homogenization pages.
   </p>
   <p>
-    <strong>There is no periodic cell.</strong> Homogenization averages over a cell that tiles
-    space, or over a stationary ensemble. The pulses are localized, with Gaussian envelopes in
-    dyadic bands, and the auxiliary torus separates them rather than tiling anything. The cone
-    condition is met by shaping the core profiles so that the target lands inside the cone; the
-    design variables are the background, not the cell.
+    <strong>There is no spatial periodic cell.</strong> Homogenization averages over a cell
+    that tiles space, or over a stationary ensemble. The construction's fast average is over the
+    angle and an auxiliary torus, but nothing is periodic in the physical variables: the pulses
+    are localized, with Gaussian envelopes in dyadic bands, and the torus separates them rather
+    than tiling space. The cone condition is met by shaping the leading profiles in the annulus
+    so that the target lands inside the cone; the design variables are the background, not the
+    cell.
   </p>
   <p>
     <strong>The fast variable is endogenous.</strong> The switching chain does not know about
@@ -236,15 +242,16 @@
     generates itself without a scaling theorem, and no such theorem is in the paper.
   </p>
 
-  <h2>Parity, eddy viscosity, and the noise that undoes it</h2>
+  <h2>Eddy viscosity, and the noise that undoes it</h2>
   <p>
     Dubrulle and Frisch showed that a parity-invariant small-scale flow homogenizes to an eddy
-    viscosity: the Reynolds stress reduces to a diffusive term with a computable coefficient.
-    Without parity invariance one gets a large-scale instability at first order instead. The
-    pulses are chosen not to be parity invariant, and their mean stress is a directed flux
-    aimed at a target, not a diffusion. The transport noise of Agresti runs the forward map:
-    its scaling limit is an eddy viscosity with enhanced dissipation, which is the
-    parity-invariant case. That is exactly the term the tuned balance cannot tolerate, and it
+    viscosity: the linear response of the Reynolds stress to a weak large-scale gradient is a
+    diffusive term with a computable coefficient. Without parity invariance one gets a
+    large-scale instability at first order instead. The paper does not discuss parity, and its
+    pulses are not a response to a large-scale gradient at all: they supply a prescribed,
+    inhomogeneous Reynolds stress, a directed flux aimed at a target, not a diffusion. The
+    transport noise of Agresti runs the forward map: because it is white in time, its scaling
+    limit is a purely diffusive eddy viscosity with enhanced dissipation. That is exactly the term the tuned balance cannot tolerate, and it
     is why the <a href="./fluctuating.html">fluctuations page</a> records that model as the one
     in which the singularity does not survive.
   </p>
