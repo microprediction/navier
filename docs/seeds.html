@@ -128,9 +128,20 @@
     which is $1.2\times10^{-4}$ for air at a millimetre and $1.5\times10^{-2}$ at the mean free
     path. It is a power of $\ell$, hence a power of $q$, hence asymptotically larger than the
     superpolynomially small designed seed; at a given physical scale the comparison depends on
-    constants the paper does not evaluate. Only the projection of the noise onto the growing
-    direction of the pulse equation is amplified, but a random field has an order-one
-    projection onto any fixed mode, at a random phase.
+    constants the paper does not evaluate. This is a pointwise, cell-scale fluctuation, and it is not yet the seed. Only the
+    coherent projection of the noise onto the normalized pulse mode is amplified. A pulse
+    spanning $N$ independent thermal cells picks up an amplitude of order $\epsilon_T/\sqrt N$,
+    not $\epsilon_T$, and the true factor depends on the Landau&ndash;Lifshitz covariance and on
+    the pulse's support. Write the modal seed as
+  </p>
+  <div class="equation-card">
+    $$\epsilon_{T,\rm mode} = \epsilon_T\,c_{\rm proj}(q),$$
+  </div>
+  <p>
+    with $c_{\rm proj}$ not yet computed. As long as it decays at most polynomially in $q$, the
+    modal seed still beats the superpolynomially small designed seed asymptotically. Nonzero
+    it almost surely is: a random field has a nonzero projection onto any fixed mode, at a
+    random phase.
   </p>
 
   <div class="widget">
@@ -138,7 +149,7 @@
       <label for="G">log<sub>10</sub> G</label>
       <input type="range" id="G" min="1" max="14" step="0.25" value="6" />
       <span class="val" id="GVal">6.00</span>
-      <label for="eT">log<sub>10</sub> &epsilon;<sub>T</sub></label>
+      <label for="eT">log<sub>10</sub> &epsilon;<sub>T,mode</sub></label>
       <input type="range" id="eT" min="-9" max="-1" step="0.25" value="-4" />
       <span class="val" id="eTVal">&minus;4.00</span>
       <label for="pk">log<sub>10</sub> q<sup>h/2</sup></label>
@@ -150,11 +161,12 @@
   </div>
   <div class="lookfor">
     What to look for: the designed pulse, seeded at $q^{h/2}/G$, peaks at $q^{h/2}$ times the
-    background. The thermally seeded mode follows the same envelope from $\epsilon_T$ and peaks
-    at $G\epsilon_T$, so it exceeds the designed pulse by $G\epsilon_T q^{-h/2}$. There are two
-    thresholds. Once the orange peak passes the blue peak, $G\epsilon_T\gtrsim q^{h/2}$, the
+    background. The thermally seeded mode follows the same envelope from the modal seed
+    $\epsilon_{T,\rm mode}$ and peaks at $G\epsilon_{T,\rm mode}$, so it exceeds the designed pulse
+    by $G\epsilon_{T,\rm mode}\, q^{-h/2}$. There are two thresholds. Once the orange peak passes
+    the blue peak, $G\epsilon_{T,\rm mode}\gtrsim q^{h/2}$, the
     thermal mode is as large as the designed pulse and can alter the prescribed stress. Once it
-    passes the background, $G\epsilon_T\gtrsim 1$, the linearization of the annulus itself
+    passes the background, $G\epsilon_{T,\rm mode}\gtrsim 1$, the linearization of the annulus itself
     fails. With the default values both happen. The last slider is set away from zero only to
     separate the two lines; for the $h$ the construction uses, $q^{h/2}$ is within a fraction of
     a percent of one and the thresholds nearly coincide.
@@ -162,9 +174,10 @@
 
   <h2>What this does and does not show</h2>
   <p>
-    It shows that the constructed solution is not a solution of the thermally fluctuating
+    Subject to the coherence factor above, it indicates that the constructed solution is not a solution of the thermally fluctuating
     equation with the same force, and that the difference is not small: the unmodelled input to
-    the amplifier exceeds the modelled one by a factor $G\epsilon_T q^{-h/2}$ that grows without
+    the amplifier exceeds the modelled one by a factor $G\epsilon_{T,\rm mode}\, q^{-h/2}$ that,
+    if $c_{\rm proj}$ decays at most polynomially, grows without
     bound as the singular time approaches. It does not show that the thermal equation has no singularity
     under this or any force. A turbulent annulus might still concentrate; it would just not do so
     by this construction. And it takes the thermal noise at scale $\ell$ to be present at the
@@ -182,8 +195,8 @@
   <h2>A test that could be run</h2>
   <p>
     Integrate the two-dimensional amplitude equation of the pulses page for one band with
-    (a) the designed initial condition and (b) an ensemble of random initial conditions of
-    relative size $\epsilon_T$, and record the stage at which (b) first exceeds the background.
+    (a) the designed initial condition and (b) an ensemble of random initial conditions drawn
+    from the Landau&ndash;Lifshitz covariance, which also estimates $c_{\rm proj}(q)$, and record the stage at which (b) first exceeds the background.
     Then compare that stage with the stage at which the cumulative stress of (a) has cancelled
     the leading residual to the accuracy of one correction cycle, $q^{h/10}$. The first quantity
     depends on constants the paper fixes but does not evaluate. A careful reading of Sections 6
@@ -211,7 +224,7 @@
       ctx.fillStyle='#5a5a5a';ctx.textAlign='left';ctx.fillText('background speed',L+6,Y(0)-5);
       function curve(offset,color,label){ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();for(var i=0;i<=N;i++){var v=i/N;var lg=offset-a*(v-0.5)*(v-0.5)/Math.LN10;if(i===0)ctx.moveTo(X(v),Y(lg));else ctx.lineTo(X(v),Y(lg));}ctx.stroke();ctx.fillStyle=color;ctx.font='12px system-ui';ctx.fillText(label,X(0.5)+6,Y(offset)+(offset>0?-8:16));}
       curve(lP,'#2a78d6','designed pulse (seed q^{h/2}/G, peak q^{h/2})');
-      curve(lG+lE,'#eb6834','thermally seeded mode (seed ε_T)');
+      curve(lG+lE,'#eb6834','thermally seeded mode (seed ε_T,mode)');
       var r=lG+lE-lP,over=lG+lE>0,rival=r>0;
       ro.innerHTML='G is the growth factor of a pulse, \u03b5_T the thermal seed relative to the background. Designed seed 10^'+(lP-lG).toFixed(2)+'; thermal seed 10^'+lE.toFixed(2)+'; thermal over designed 10^'+r.toFixed(2)+'. '+(over?'<b>The thermal mode exceeds the background: the linearization of the annulus fails.</b>':(rival?'<b>The thermal mode exceeds the designed pulse: the prescribed stress is disrupted, though the linearization still holds.</b>':'The thermal mode stays below the designed pulse over this pulse.'));
     }

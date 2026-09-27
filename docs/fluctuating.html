@@ -208,13 +208,17 @@
   </p>
   <p>
     There is a heuristic. The velocity fluctuation thermal noise induces at scale $\ell$ is
-    $v_T(\ell)=\sqrt{k_BT/\rho\ell^3}$, and relative to the core speed $\nu/\ell$ this is
-    $\sqrt{k_BT/\rho\ell}\,/\nu$, a fraction that grows as the core shrinks and reaches about a
-    percent at the mean free path in air. Asymptotically that exceeds the
+    $v_T(\ell)=\sqrt{k_BT/\rho\ell^3}$, and relative to the $h=0$ benchmark core speed
+    $\nu/\ell$ this is $\sqrt{k_BT/\rho\ell}\,/\nu$, a fraction that grows as the core shrinks and
+    reaches about a percent at the mean free path in air. Against the construction's actual core
+    speed the ratio carries a further factor $(\tau/T_0)^{h}$ and unstated profile constants, so it
+    scales like $\tau^{-1/4+h}$ rather than $\tau^{-1/4}$; since $h<1/4$ it still grows. This is a
+    pointwise fluctuation. What seeds a pulse is its coherent projection onto the pulse mode,
+    which is smaller by a factor that has not been computed. Asymptotically that exceeds the
     exponentially small seeds of the construction by more than any power of $q$; at a given
     physical scale the comparison depends on constants the paper does not evaluate. The
-    <a href="./seeds.html">seeds page</a> puts the two numbers side by side. Thermal noise
-    projected onto the growing direction of the pulse equation is amplified by the same factor
+    <a href="./seeds.html">seeds page</a> puts the two numbers side by side. That coherent
+    projection onto the growing direction of the pulse equation is amplified by the same factor
     the designed seed is, and if it reaches the background amplitude the linearization fails and
     the annulus is turbulent rather than tuned. This is not a proof that the thermal equation
     does not blow up; it is a reason to expect that the constructed solution is not what the
