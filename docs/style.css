@@ -79,6 +79,8 @@ table.impl thead th {
   color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--border);
 }
 table.impl tbody td:first-child { font-weight: 600; white-space: nowrap; }
+/* two-column dictionaries whose labels are phrases, not names: let them wrap */
+table.impl.wrap tbody td:first-child { white-space: normal; width: 40%; }
 table.impl tr:last-child td { border-bottom: none; }
 table.impl .mode { color: var(--muted); font-size: 0.9rem; }
 
